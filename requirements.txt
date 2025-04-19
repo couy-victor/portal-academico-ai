@@ -1,0 +1,14 @@
+langchain>=0.1.0
+langchain-openai>=0.0.2
+langgraph>=0.0.20
+supabase>=2.0.0
+diskcache>=5.6.1
+python-dotenv>=1.0.0
+langsmith>=0.0.63
+typing-extensions>=4.7.1
+tavily-python>=0.2.2
+langchain-community>=0.0.16
+pypdf2>=3.0.1
+faiss-cpu>=1.7.4
+unstructured>=0.11.2
+pdfminer.six>=20221105

@@ -1,0 +1,160 @@
+FLUXO COMPLETO DO SISTEMA MULTI-AGENTES ACADÊMICO
+
+COMPONENTES:
+
+1. START
+2. User Context Node
+3. Cache Check (Decisão)
+4. Intent Router
+5. Schema Retriever
+6. SQL Generator
+7. Query Validator
+8. DBA Guard
+9. Executor
+10. Fallback Handler
+11. Response Generator
+12. Cache Update
+13. Logger
+14. END
+
+CONEXÕES:
+
+- START → User Context Node
+- User Context Node → Cache Check
+- Cache Check → Intent Router (se Cache Miss)
+- Cache Check → Response Generator (se Cache Hit)
+- Intent Router → Schema Retriever
+- Schema Retriever → SQL Generator
+- SQL Generator → Query Validator
+- Query Validator → DBA Guard
+- DBA Guard → Executor
+- Executor → Fallback Handler (se Error)
+- Executor → Response Generator (se Success)
+- Fallback Handler → Logger
+- Response Generator → Cache Update
+- Cache Update → Logger
+- Logger → END
+
+DESCRIÇÃO DOS COMPONENTES:
+
+1. START: Ponto de entrada do grafo.
+
+2. User Context Node: 
+   - Recupera e enriquece o contexto do usuário (RA, disciplina, etc.)
+   - Mapeia o RA para matrícula se necessário
+   - Adiciona informações padrão se não encontrar no banco
+
+3. Cache Check: 
+   - Verifica se há uma resposta em cache para a consulta
+   - Se houver um hit no cache, vai direto para o Response Generator
+   - Se não houver cache, continua o fluxo normal
+
+4. Intent Router: 
+   - Classifica a intenção da pergunta do usuário
+   - Identifica se é sobre notas, faltas, horários, etc.
+   - Atribui um nível de confiança à classificação
+
+5. Schema Retriever: 
+   - Recupera o schema do banco de dados
+   - Obtém informações sobre tabelas, colunas, chaves primárias e estrangeiras
+   - Usa cache para evitar consultas frequentes ao banco
+
+6. SQL Generator: 
+   - Gera a consulta SQL com base na intenção e no schema
+   - Usa técnica ReAct para raciocinar sobre a consulta
+   - Parametriza a consulta para evitar injeção SQL
+
+7. Query Validator: 
+   - Valida a consulta SQL quanto à correção e segurança
+   - Verifica sintaxe SQL
+   - Identifica possíveis problemas de segurança
+   - Sugere correções se necessário
+
+8. DBA Guard: 
+   - Otimiza a consulta SQL para performance
+   - Adiciona LIMIT se necessário
+   - Verifica uso de índices
+   - Evita consultas que possam causar problemas de performance
+
+9. Executor: 
+   - Executa a consulta SQL no Supabase
+   - Sanitiza e parametriza a consulta
+   - Executa via função RPC segura
+   - Captura erros e resultados
+
+10. Fallback Handler: 
+    - Lida com erros e fornece respostas alternativas
+    - Gera respostas amigáveis para erros
+    - Sugere alternativas ao usuário
+
+11. Response Generator: 
+    - Converte os resultados da consulta em linguagem natural
+    - Formata os resultados de forma amigável
+    - Personaliza a resposta com base no contexto do usuário
+
+12. Cache Update: 
+    - Atualiza o cache com a nova resposta
+    - Armazena resultados para consultas futuras
+    - Define tempo de expiração apropriado
+
+13. Logger: 
+    - Registra a interação para análise
+    - Armazena métricas de desempenho
+    - Registra erros e sucessos
+    - Facilita análise posterior
+
+14. END: Ponto de saída do grafo.
+
+FLUXO DE DADOS:
+
+1. Entrada:
+   - Pergunta do usuário: "Quantas faltas eu tenho em Teoria da Computação?"
+   - Contexto do usuário: RA: 201268, disciplina_id: 3e5e23c8-87d5-521e-90df-eecb69a8330a
+
+2. User Context Node:
+   - Adiciona: matricula (mapeada do RA), periodo_atual
+   - Estado: {user_query, user_id, user_context{RA, disciplina_id, matricula, periodo_atual}}
+
+3. Cache Check:
+   - Verifica se há resposta em cache para esta consulta
+   - Se hit: pula para Response Generator
+   - Se miss: continua o fluxo
+
+4. Intent Router:
+   - Classifica a intenção como "faltas"
+   - Adiciona: {intent: "faltas", confidence: 0.95}
+
+5. Schema Retriever:
+   - Obtém estrutura do banco de dados
+   - Adiciona: {schema_info: {tables: [...]}}
+
+6. SQL Generator:
+   - Gera a consulta SQL
+   - Adiciona: {generated_sql: "SELECT a.data, p.presente FROM aulas a JOIN presencas p..."}
+
+7. Query Validator:
+   - Valida a consulta SQL
+   - Adiciona: {validation_results: [...]}
+
+8. DBA Guard:
+   - Otimiza a consulta (adiciona LIMIT, etc.)
+   - Atualiza: {generated_sql: "SELECT a.data, p.presente ... LIMIT 100"}
+
+9. Executor:
+   - Executa a consulta no Supabase
+   - Adiciona: {query_results: [{data: "2023-04-10", presente: false}, ...]}
+
+10. Response Generator:
+    - Converte resultados em linguagem natural
+    - Adiciona: {natural_response: "Você tem 1 falta em Teoria da Computação..."}
+
+11. Cache Update:
+    - Armazena a resposta em cache
+    - Não modifica o estado
+
+12. Logger:
+    - Registra a interação
+    - Não modifica o estado
+
+13. Saída:
+    - Resposta natural para o usuário: "Você tem 1 falta em Teoria da Computação, ocorrida em 10 de abril de 2023. Nas outras 4 aulas, você esteve presente."
