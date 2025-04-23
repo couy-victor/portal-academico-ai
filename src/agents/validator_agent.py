@@ -22,8 +22,12 @@ def query_validator(state: AcademicAgentState) -> AcademicAgentState:
     Returns:
         AcademicAgentState: Updated state with validation results
     """
-    # Skip if we already have an error or coming from cache
-    if state.get("error") or state.get("from_cache", False):
+    # Skip if we already have an error, coming from cache, or if we should skip validation
+    if state.get("error") or state.get("from_cache", False) or state.get("skip_sql_generation", False):
+        # If we're skipping validation due to web search, set empty validation results
+        if state.get("skip_sql_generation", False):
+            logger.info("Skipping SQL validation as requested by previous agent")
+            state["validation_results"] = []
         return state
 
     # Create prompt for SQL validation

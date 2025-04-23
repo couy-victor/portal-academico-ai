@@ -124,7 +124,7 @@ python src/main.py --query "Quantas faltas eu tenho em Anatomia?" --user_id "use
 Execute o script de teste interativo para conversar com o sistema:
 
 ```bash
-python src/interactive_test.py
+python tests/interactive_test.py
 ```
 
 Este script permite:
@@ -137,7 +137,7 @@ Este script permite:
 Execute o script de teste com RA específico:
 
 ```bash
-python test_ra_specific.py
+python tests/test_ra_specific.py
 ```
 
 Este script testa o sistema com um RA e disciplina específicos, verificando:

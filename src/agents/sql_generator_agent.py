@@ -83,8 +83,12 @@ def sql_generator(state: AcademicAgentState) -> AcademicAgentState:
     Returns:
         AcademicAgentState: Updated state with generated SQL
     """
-    # Skip if we already have an error or coming from cache
-    if state.get("error") or state.get("from_cache", False):
+    # Skip if we already have an error, coming from cache, or if we should skip SQL generation
+    if state.get("error") or state.get("from_cache", False) or state.get("skip_sql_generation", False):
+        # If we're skipping SQL generation due to web search, set a dummy SQL
+        if state.get("skip_sql_generation", False):
+            logger.info("Skipping SQL generation as requested by previous agent")
+            state["generated_sql"] = "SELECT 1 AS dummy"
         return state
 
     # Create prompt with ReAct technique and few-shot examples
@@ -151,8 +155,9 @@ def sql_generator(state: AcademicAgentState) -> AcademicAgentState:
         # Update state with generated SQL
         state["generated_sql"] = sql_query
 
-        # Log success
-        logger.info(f"Generated SQL query: {sql_query[:100]}...")
+        # Log success with full SQL query for debugging
+        logger.info(f"Generated SQL query: {sql_query}")
+        print(f"\nSQL GERADO PELO AGENTE:\n{sql_query}\n")
 
     except Exception as e:
         error_msg = f"Error generating SQL: {str(e)}"

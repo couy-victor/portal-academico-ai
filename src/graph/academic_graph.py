@@ -12,14 +12,15 @@ from src.agents.cache_agent import cache_agent, update_cache
 from src.agents.router_agent import intent_router
 from src.agents.schema_agent import schema_retriever
 from src.agents.sql_generator_agent import sql_generator
+from src.agents.nl2sql_agent import nl2sql_agent
 from src.agents.validator_agent import query_validator
 from src.agents.dba_guard_agent import dba_guard
 from src.agents.executor_agent import executor_agent
 from src.agents.response_agent import response_generator
 from src.agents.fallback_agent import fallback_handler
 from src.agents.logger_agent import logger_agent
+from src.agents.integrated_tavily_agent import integrate_tavily_search
 # Agentes adicionais para funcionalidades expandidas (não utilizados na versão atual)
-# from src.agents.tavily_agent import tavily_search_agent
 # from src.agents.rag_agent import rag_agent
 # from src.agents.augmented_response_agent import augmented_response_agent
 # from src.agents.main_router_agent import main_router_agent
@@ -42,8 +43,10 @@ def create_academic_graph() -> Callable:
     academic_graph.add_node("user_context_node", user_context_agent)
     academic_graph.add_node("cache_check", cache_agent)
     academic_graph.add_node("intent_router", intent_router)
+    academic_graph.add_node("tavily_search", integrate_tavily_search)
     academic_graph.add_node("schema_retriever", schema_retriever)
-    academic_graph.add_node("sql_generator", sql_generator)
+    # Use the new NL2SQL agent instead of the old SQL generator
+    academic_graph.add_node("sql_generator", nl2sql_agent)
     academic_graph.add_node("query_validator", query_validator)
     academic_graph.add_node("dba_guard", dba_guard)
     academic_graph.add_node("executor", executor_agent)
@@ -64,7 +67,8 @@ def create_academic_graph() -> Callable:
     academic_graph.add_edge(START, "user_context_node")
     academic_graph.add_edge("user_context_node", "cache_check")
     academic_graph.add_edge("cache_check", "intent_router")
-    academic_graph.add_edge("intent_router", "schema_retriever")
+    academic_graph.add_edge("intent_router", "tavily_search")
+    academic_graph.add_edge("tavily_search", "schema_retriever")
     academic_graph.add_edge("schema_retriever", "sql_generator")
     academic_graph.add_edge("sql_generator", "query_validator")
     academic_graph.add_edge("query_validator", "dba_guard")

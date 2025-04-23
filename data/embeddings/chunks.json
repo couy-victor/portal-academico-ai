@@ -1,0 +1,56 @@
+[
+  {
+    "text": "PLANO DE ENSINO \n2021",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 0,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-0"
+  },
+  {
+    "text": "1. ESTRUTURAÇÃO DA DISCIPLINA \n \n1.1. FICHA TÉCNICA \n \nMATRIZ 2019 \nCURSOS \nTecnologia em Análise e Desenvolvimento de Sistemas \nEngenharia de Computação \nUNIDADE CURRICULAR Banco de Dados \nCARGA HORÁRIA Presencial A Distância \n80h 64h 16h \nPROFESSOR(A) \nEdinelson Ap. Batista de Almeida \nWarner Brezolin \n \n1.1. COMPETÊNCIAS \n \n \n Profissional que atua na análise e desenvolvimento de aplicações em software. \n Conhecer e aplicar metodologias e ferramentas adotadas em engenharia  de software, \ndesenvolver habilidades de técnicas de programação e modelagem de dados; analisar \ninformações e requisitos para projetar e  implementar banco de dados; conhecer as \nprincipais funções de sistemas operacionais e sua relação com sistemas de informação \ne IoT. \n Organizar, interpretar e sintetizar informações para tomada de decisões.  \n Buscar soluções viáveis e inovadoras na resolução de situações-problema;  \n Trabalhar em equipe, promovendo a troca de informações e a participação coletiva,",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 1,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-1"
+  },
+  {
+    "text": " Buscar soluções viáveis e inovadoras na resolução de situações-problema;  \n Trabalhar em equipe, promovendo a troca de informações e a participação coletiva, \ncom autocontrole e flexibilidade.  \n Elaborar e manter a documentação pertinente ao processo de software;  \n Projetar o armazenamento e o tratamento de dados e realizar sua implementação. \n Especificar e gerenciar requisitos de software e o projeto de interfaces. \n Interpretar e elaborar documentos, gráficos, tabelas e diagramas. \n Analisar, projetar, documentar, implementar, testar, implantar e manter sistemas \ncomputacionais. \n Avaliar, selecionar e utilizar ferramentas, metodologias e tecnologias adequadas ao \nproblema e ao contexto para a produção de sistemas computacionais.  \n Vistoriar, realizar perícia, avaliar, emitir laudo e parecer técnico em sua área de atuação",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 1,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-2"
+  },
+  {
+    "text": "1.2. EMENTA \n \n \nConceitos de Sistemas de Informação informatizados e da Tecnologia de Banco de Dados. \nFundamentos do Desenvolvimento de Aplicativos de Banco de Dados. Modelo Conceitual de Banco \nde Dados: Modelo Entidade -Relacionamento. Modelo Lógico Relacional de  Banco de Dados. \nFundamentos de SQL ( Structured Query Language ). Fundamentos de Modelo Físico. Tutorial de \nSGBDs livres. Teoria da Normalização. Arquitetura Interna de SGBDs: estrutura de arquivos e \narmazenamento, indexação e hashing, processamento e otimi zação de consultas, transações, \ncontrole de concorrência, sistema de recuperações. Noções de Banco de Dados Distribuídos. \nTópicos Avançados em Banco de Dados. \n \n \n \n1.3. OBJETIVO GERAL \n \n \nCapacitar os alunos na implantação de um projeto prático de bancos de dados utilizando as principais \ntecnologias disponíveis, aquisição do conhecimento sobre a  gerência de transações, controle de",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 2,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-3"
+  },
+  {
+    "text": "Capacitar os alunos na implantação de um projeto prático de bancos de dados utilizando as principais \ntecnologias disponíveis, aquisição do conhecimento sobre a  gerência de transações, controle de \nconcorrência e otimização de consultas efetuadas pelo SGBD e tecnologias emergentes.  \n \n \n \n1.4. OBJETIVOS ESPECÍFICOS  \n \n \n Conhecer os Modelos Conceituais, Lógicos e Físicos; \n Conhecer fundamentos da Linguagem de Consulta (SQL); \n Aprimorar conhecimentos de conceitos sobre a Tecnologia de Banco de Dados; \n Conhecer técnicas de otimização de Projeto e Consultas em Banco de Dados; \n Conhecer conceitos de soluções em termos de Transações, Concorrência e Recuperação; \n Conhecer Tópicos Avançados em Banco de Dados; \n Conhecer a importância de Metodologias, Técnicas e Ferramentas de Projetos de Banco de \nDados.",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 2,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-4"
+  },
+  {
+    "text": "1.5. UNIDADES DE APRENDIZAGEM \n \nCONTEÚDO PROGRAMÁTICO    \nUA1 – Introdução e Conceitos básicos em Banco de dados; Modelo Entidade-Relacionamento (E-\nR) e Conceitos básicos do Modelo E-R \nUA2 – Abordagem entidade-relacionamento: entidades, atributos e relacionamentos \nUA3 – Abordagem entidade-relacionamento: generalização e especialização; Modelo Relacional: \nTabelas / Chaves / Restrições relacionais / Integridade \nUA4 – Mapeamento E-R para relacional \nUA5 – Normalização de Dados e Álgebra Relacional \nUA6 – Linguagem SQL: Definição de estruturas. Armazenamento, recuperação de dados, consultas \ne atualizações \nUA7 – Linguagem SQL: Junções de tabelas. Funções de agregação: totalizando dados em \nconsultas \nUA8 – Linguagem SQL: Consultas avançadas, Subconsultas (Subqueries) e Transações \n \n2. METODOLOGIA \nOs conteúdos estão organizados em Unidades de Aprendizagem (UA) e serão trabalhados \nem aulas expositivas, por meio da Sala de Aula Invertida e com Metodologias Ativas de",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 3,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-5"
+  },
+  {
+    "text": "2. METODOLOGIA \nOs conteúdos estão organizados em Unidades de Aprendizagem (UA) e serão trabalhados \nem aulas expositivas, por meio da Sala de Aula Invertida e com Metodologias Ativas de \nAprendizagem, complementadas com conteúdo e atividades no Ambiente Virtual de \nAprendizagem (AVA), em que a metodologia está fundamentada na aprendizagem autônoma \ncom diversas atividades, tais como: indicação de leitura de capítulos de livro da Biblioteca \nVirtual da Pearson, livros disponíveis nas bibliotecas do campus, artigos de fontes confiáveis, \natividades de estudo, fóruns de discussão, tarefas, questionários, mapa mental e conteúdos \ncomplementares, entre outros.    \n3. AVALIAÇÃO  \nO(a) aluno(a) conta com duas notas específicas da disciplina, a Nota A1 e a Nota A2. Ambas \nsão resultado das avaliações on-line e presencial, no total de 4,0 (quatro) pontos para cada \numa das etapas (A1 e A2). Acrescenta-se, ainda, a Avaliação Integrada (AI), no valor de",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 3,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-6"
+  },
+  {
+    "text": "são resultado das avaliações on-line e presencial, no total de 4,0 (quatro) pontos para cada \numa das etapas (A1 e A2). Acrescenta-se, ainda, a Avaliação Integrada (AI), no valor de \n2,0 (dois) pontos. A somatória das Notas A1, A2 e AI correspondem a 70% da Média Final e \no Projeto Integrador corresponde a 30% da Média Final da disciplina.",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 3,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-7"
+  },
+  {
+    "text": "4. REFERÊNCIAS BIBLIOGRÁFICAS \n \n4.1. BIBLIOGRAFIA BÁSICA \nELMASRI, Ramez; NAVATHE, Shamkant B. Sistemas de Banco de Dados: Fundamentos e \nAplicações. 3 ed. Rio de Janeiro: LTC, 2002. 864 p. \nHEUSER, Carlos Alberto. Projeto de Banco de Dados . 4 ed. Porto Alegre: Sagra-Luzzatto, 2001. \n204p. \nKORTH, Henry F.; SILBERSCHATZ, Abraham; SUDERSHAN, S. Sistema de Banco de Dados . 3 \ned. São Paulo: Makron Books do Brasil, 1998. 778p. \n \n4.2. BIBLIOGRAFIA COMPLEMENTAR \nDATE, Crish J. Introdução a Sistemas de Bancos de Dados  – Tradução da 7 ed. Americana. Rio \nde Janeiro: Editora Campus, 2000. \nHERNANDEZ, Michael J. Aprenda a Projetar seu próprio Banco de Dados. São Paulo: Makron \nBooks do Brasil, 2000.   \nKHOSHAFIAN, Setrag. Banco de dados orientado a objeto. Rio de Janeiro: Infobook, 1994. \nMELO, Rubens N.; SILVA, Sidney Dias da; TANAKA, Asterio K . Banco de dados em \naplicações cliente/servidor. Rio de Janeiro: Infobook, 1997.",
+    "source": "pee_bancodados_pe_edit+rev.pdf",
+    "page": 4,
+    "chunk_id": "pee_bancodados_pe_edit+rev.pdf-8"
+  }
+]

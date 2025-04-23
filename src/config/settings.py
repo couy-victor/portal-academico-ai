@@ -41,6 +41,13 @@ PDF_STORAGE_DIR = os.getenv("PDF_STORAGE_DIR", "./data/pdfs")
 EMBEDDINGS_DIR = os.getenv("EMBEDDINGS_DIR", "./data/embeddings")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1000"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "200"))
+RAG_STORAGE_TYPE = os.getenv("RAG_STORAGE_TYPE", "supabase")  # "local" ou "supabase"
+
+# BM25 Configuration
+USE_BM25 = os.getenv("USE_BM25", "True").lower() == "true"
+HYBRID_ALPHA = float(os.getenv("HYBRID_ALPHA", "0.5"))  # Peso para embeddings vs BM25
+BM25_K1 = float(os.getenv("BM25_K1", "1.5"))  # Parâmetro k1 do BM25
+BM25_B = float(os.getenv("BM25_B", "0.75"))  # Parâmetro b do BM25
 
 # Tavily Configuration
 TAVILY_MAX_RESULTS = int(os.getenv("TAVILY_MAX_RESULTS", "5"))

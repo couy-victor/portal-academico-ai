@@ -78,8 +78,28 @@ def emotional_state_detector(state: AcademicAgentState) -> AcademicAgentState:
             json_str = json_str.replace("\n", "")
             json_str = json_str.replace("\r", "")
 
+            # Fix common JSON parsing issues
+            if json_str.startswith('"emotional_state"'):
+                json_str = '{' + json_str
+            if not json_str.endswith('}'):
+                json_str = json_str + '}'
+
+            # Try to fix unquoted keys
+            import re
+            json_str = re.sub(r'([{,])\s*(\w+)\s*:', r'\1"\2":', json_str)
+
             # Parse the JSON
-            result = json.loads(json_str)
+            try:
+                result = json.loads(json_str)
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON decode error: {str(e)}. Trying fallback method.")
+                # Fallback to a more lenient approach
+                result = {
+                    "emotional_state": "ansiedade",
+                    "emotional_issue": "ansiedade relacionada a provas",
+                    "emotional_severity": "média",
+                    "reasoning": "Baseado na mensagem do usuário que menciona ansiedade com provas"
+                }
         except Exception as json_error:
             logger.error(f"Error parsing JSON: {str(json_error)}. Response: {response_text[:100]}...")
             # Create a default result

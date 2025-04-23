@@ -112,3 +112,4 @@ def clear_cache() -> None:
 
     print("Clearing cache...")
     cache.clear()
+    print("Cache cleared successfully!")
