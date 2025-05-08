@@ -13,3 +13,9 @@ rank-bm25
 pydantic
 langchain-core
 langchain-groq
+diskcache
+tiktoken
+numpy
+httpx
+pdfminer.six
+langsmith
