@@ -2,6 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/chat": "pages/chat.js",
-  "/api/planning": "pages/api/planning.js"
+  "/": "pages/index.js",
+  "/api/academic": "pages/api/academic.js",
+  "/chat": "pages/chat.js"
 }

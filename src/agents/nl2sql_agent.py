@@ -75,6 +75,9 @@ def senior_sql_writer_node(state: NL2SQLState) -> Dict[str, Any]:
     - Para campos de texto como 'status', 'nome', etc., SEMPRE use ILIKE ou LOWER() para comparações case-insensitive.
       Por exemplo: WHERE LOWER(status) = LOWER('vencido') ou WHERE status ILIKE '%vencido%'
     - Prefira usar ILIKE com '%texto%' para campos de status e outros campos de texto para evitar problemas de correspondência exata.
+
+    IMPORTANTE: Na tabela 'matriculas', o status de um aluno matriculado é 'Cursando', não 'Matriculado'.
+    Para consultas sobre disciplinas em que o aluno está matriculado, use: WHERE m.status ILIKE '%cursando%'
     """
 
     # Create instruction with schema and question
@@ -137,6 +140,9 @@ def senior_qa_engineer_node(state: NL2SQLState) -> Dict[str, Any]:
     4. Se a consulta é segura e eficiente
     5. Se a consulta usa ILIKE ou LOWER() para comparações de texto, especialmente para campos como 'status', 'nome', etc.
        Por exemplo: WHERE LOWER(status) = LOWER('vencido') ou WHERE status ILIKE '%vencido%'
+
+    IMPORTANTE: Na tabela 'matriculas', o status de um aluno matriculado é 'Cursando', não 'Matriculado'.
+    Para consultas sobre disciplinas em que o aluno está matriculado, verifique se está usando: WHERE m.status ILIKE '%cursando%'
 
     Responda 'ACEITO' se a consulta estiver correta ou 'REJEITADO' se não estiver, seguido de uma explicação detalhada.
     Se a consulta não usar ILIKE ou LOWER() para comparações de texto, rejeite-a e sugira a correção.
@@ -305,6 +311,13 @@ def format_schema_for_nl2sql(schema_info: Dict[str, Any]) -> str:
 
             formatted_schema += f" - {column_name} ({data_type}, {nullable_str})\n"
 
+            # Adicionar amostras de valores se disponíveis
+            sample_key = f"{table_name}.{column_name}"
+            if "column_samples" in schema_info and sample_key in schema_info["column_samples"]:
+                sample_values = schema_info["column_samples"][sample_key]
+                if sample_values:
+                    formatted_schema += f"   Sample values: {', '.join(str(v) for v in sample_values)}\n"
+
         # Format primary keys
         primary_keys = table.get("primary_keys", [])
         if primary_keys:
@@ -321,6 +334,22 @@ def format_schema_for_nl2sql(schema_info: Dict[str, Any]) -> str:
                 formatted_schema += f" - {column_name} -> {foreign_table}.{foreign_column}\n"
 
         formatted_schema += "\n"
+
+    # Adicionar seção específica para valores de status importantes
+    formatted_schema += "Important Status Values:\n"
+
+    # Adicionar valores de status de matrícula
+    if "column_samples" in schema_info and "matriculas.status" in schema_info["column_samples"]:
+        matricula_status = schema_info["column_samples"]["matriculas.status"]
+        formatted_schema += f"- Matriculas status values: {', '.join(str(v) for v in matricula_status)}\n"
+        formatted_schema += "  IMPORTANT: Use 'Cursando' (not 'Matriculado') for active enrollments\n"
+
+    # Adicionar valores de status financeiro
+    if "column_samples" in schema_info and "financeiro.status" in schema_info["column_samples"]:
+        financeiro_status = schema_info["column_samples"]["financeiro.status"]
+        formatted_schema += f"- Financeiro status values: {', '.join(str(v) for v in financeiro_status)}\n"
+
+    formatted_schema += "\n"
 
     return formatted_schema
 
@@ -380,6 +409,22 @@ def nl2sql_agent(state: AcademicAgentState) -> AcademicAgentState:
         if state.get("skip_sql_generation", False):
             logger.info("Skipping SQL generation as requested by previous agent")
             state["generated_sql"] = "SELECT 1 AS dummy"
+        return state
+
+    # Verificar se a consulta é conceitual e deve usar RAG em vez de SQL
+    if state.get("metadata", {}).get("use_rag_for_conceptual", False):
+        logger.info("Skipping SQL generation for conceptual query that should use RAG")
+        state["generated_sql"] = "SELECT 1 AS dummy"
+        state["skip_sql_generation"] = True
+        state["skip_database_query"] = True
+        return state
+
+    # Verificar se a consulta é sobre informações externas e deve pular SQL
+    if state.get("metadata", {}).get("skip_sql_for_external_info", False):
+        logger.info("Skipping SQL generation for external information query that should use web search")
+        state["generated_sql"] = "SELECT 1 AS dummy"
+        state["skip_sql_generation"] = True
+        state["skip_database_query"] = True
         return state
 
     try:

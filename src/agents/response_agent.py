@@ -72,13 +72,16 @@ def response_generator(state: AcademicAgentState) -> AcademicAgentState:
 
         Gere uma resposta em linguagem natural que:
         1. Seja direta e responda exatamente o que foi perguntado
-        2. Inclua os dados relevantes dos resultados da consulta
+        2. Inclua APENAS os dados relevantes dos resultados da consulta
         3. Use um tom amigável mas profissional
         4. Seja concisa (máximo 3 frases)
         5. Não mencione detalhes técnicos como SQL ou banco de dados
         6. Se a pergunta for sobre faltas, seja preciso e mencione o número exato de faltas
         7. Se o número de faltas for 1, use "1 falta" (singular), se for 0 ou mais de 1, use "faltas" (plural)
         8. Sempre mencione o nome da disciplina na resposta, usando o campo "disciplina_nome" dos resultados
+        9. IMPORTANTE: Se os resultados da consulta estiverem vazios (lista vazia), NÃO invente informações
+        10. Se os resultados estiverem vazios, informe ao usuário que não foram encontrados resultados para a consulta
+        11. NUNCA mencione disciplinas específicas se elas não aparecerem nos resultados da consulta
 
         Resposta:
         """)

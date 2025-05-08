@@ -20,13 +20,13 @@ from src.agents.response_agent import response_generator
 from src.agents.fallback_agent import fallback_handler
 from src.agents.logger_agent import logger_agent
 from src.agents.integrated_tavily_agent import integrate_tavily_search
-# Agentes adicionais para funcionalidades expandidas (não utilizados na versão atual)
-# from src.agents.rag_agent import rag_agent
-# from src.agents.augmented_response_agent import augmented_response_agent
-# from src.agents.main_router_agent import main_router_agent
-# from src.agents.emotional_support_agent import emotional_support_agent
-# from src.agents.tutor_agent import tutor_agent
-# from src.agents.planning_agent import planning_agent
+# Agentes adicionais para funcionalidades expandidas
+from src.agents.rag_agent import rag_agent
+from src.agents.augmented_response_agent import augmented_response_agent
+from src.agents.main_router_agent import main_router_agent
+from src.agents.emotional_support_agent import emotional_support_agent
+from src.agents.tutor_agent import tutor_agent
+from src.agents.planning_agent import planning_agent
 from src.utils.logging import logger
 
 def create_academic_graph() -> Callable:
@@ -42,15 +42,20 @@ def create_academic_graph() -> Callable:
     # Add nodes - simplified version
     academic_graph.add_node("user_context_node", user_context_agent)
     academic_graph.add_node("cache_check", cache_agent)
+    academic_graph.add_node("main_router", main_router_agent)  # Roteador principal
     academic_graph.add_node("intent_router", intent_router)
+    academic_graph.add_node("emotional_support", emotional_support_agent)  # Agente de suporte emocional
+    academic_graph.add_node("tutor", tutor_agent)  # Agente de tutoria
+    academic_graph.add_node("planning", planning_agent)  # Agente de planejamento
     academic_graph.add_node("tavily_search", integrate_tavily_search)
+    academic_graph.add_node("rag_retrieval", rag_agent)  # Adicionar nó RAG
     academic_graph.add_node("schema_retriever", schema_retriever)
     # Use the new NL2SQL agent instead of the old SQL generator
     academic_graph.add_node("sql_generator", nl2sql_agent)
     academic_graph.add_node("query_validator", query_validator)
     academic_graph.add_node("dba_guard", dba_guard)
     academic_graph.add_node("executor", executor_agent)
-    academic_graph.add_node("response_generator", response_generator)
+    academic_graph.add_node("response_generator", augmented_response_agent)  # Usar o agente de resposta aumentada
     academic_graph.add_node("fallback_handler", fallback_handler)
     academic_graph.add_node("cache_update", update_cache)
     academic_graph.add_node("logger", logger_agent)
@@ -61,19 +66,41 @@ def create_academic_graph() -> Callable:
         if state.get("from_cache", False):
             logger.info("Cache hit, skipping to response generator")
             return "response_generator"
-        return "intent_router"
+        return "main_router"  # Vai para o roteador principal em vez do intent_router
+
+    # Define conditional edges for main router
+    academic_graph.add_conditional_edges(
+        "main_router",
+        main_router_agent,  # Esta função retorna uma lista de nós para onde ir
+        {
+            "emotional_support": "emotional_support",
+            "tutor": "tutor",
+            "planning": "planning",
+            "intent_router": "intent_router"  # Rota padrão para consultas acadêmicas
+        }
+    )
 
     # Connect the nodes - simplified version
     academic_graph.add_edge(START, "user_context_node")
     academic_graph.add_edge("user_context_node", "cache_check")
-    academic_graph.add_edge("cache_check", "intent_router")
+    academic_graph.add_edge("cache_check", route_from_cache)  # Usa a função de roteamento
+
+    # Fluxo para o agente acadêmico
     academic_graph.add_edge("intent_router", "tavily_search")
-    academic_graph.add_edge("tavily_search", "schema_retriever")
+    academic_graph.add_edge("tavily_search", "rag_retrieval")
+    academic_graph.add_edge("rag_retrieval", "schema_retriever")
     academic_graph.add_edge("schema_retriever", "sql_generator")
     academic_graph.add_edge("sql_generator", "query_validator")
     academic_graph.add_edge("query_validator", "dba_guard")
     academic_graph.add_edge("dba_guard", "executor")
     academic_graph.add_edge("executor", "response_generator")
+
+    # Fluxo para os agentes especializados
+    academic_graph.add_edge("emotional_support", "response_generator")
+    academic_graph.add_edge("tutor", "response_generator")
+    academic_graph.add_edge("planning", "response_generator")
+
+    # Fluxo final comum
     academic_graph.add_edge("response_generator", "cache_update")
     academic_graph.add_edge("fallback_handler", "logger")
     academic_graph.add_edge("cache_update", "logger")

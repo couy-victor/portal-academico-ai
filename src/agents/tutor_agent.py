@@ -12,6 +12,11 @@ from src.config.settings import LLM_MODEL, LLM_TEMPERATURE, LLM_TEMPERATURE_CREA
 from src.models.state import AcademicAgentState
 from src.utils.logging import logger
 
+# Import enhanced tutoring modules
+from src.agents.adaptive_tutor import assess_prior_knowledge, generate_multi_level_explanation
+from src.agents.socratic_tutor import generate_socratic_questions, create_socratic_dialogue, generate_socratic_response
+from src.agents.knowledge_connector import identify_related_concepts, create_concept_map, generate_bridging_explanation
+
 def subject_classifier(state: AcademicAgentState) -> AcademicAgentState:
     """
     Classifies the subject and topic of the user's query.
@@ -74,11 +79,14 @@ def subject_classifier(state: AcademicAgentState) -> AcademicAgentState:
         json_str = json_str.replace("\n", "")
         json_str = json_str.replace("\r", "")
 
-        # Fix common JSON parsing issues
-        if json_str.startswith('"subject"'):
+        # Ensure we have valid JSON
+        if not json_str.startswith('{'):
             json_str = '{' + json_str
         if not json_str.endswith('}'):
             json_str = json_str + '}'
+
+        # Remove any trailing commas before closing brackets (common JSON error)
+        json_str = json_str.replace(',}', '}').replace(',]', ']')
 
         # Try to fix unquoted keys
         import re
@@ -360,17 +368,29 @@ def tutor_response_generator(state: AcademicAgentState) -> AcademicAgentState:
 
     Pergunta original do estudante: {query}
 
-    Explicação preparada: {explanation}
+    Nível de conhecimento prévio do estudante: {knowledge_level}
+
+    {concept_map_section}
+
+    {bridging_explanation_section}
+
+    {multi_level_explanation_section}
 
     {examples_section}
 
+    {socratic_questions_section}
+
     Gere uma resposta tutorial completa que:
     1. Cumprimente o estudante de forma amigável
-    2. Apresente a explicação de forma clara e estruturada
-    3. Inclua exemplos práticos para ilustrar o conceito
-    4. Forneça exercícios para praticar, com suas respectivas soluções
-    5. Encoraje o estudante a fazer perguntas adicionais se necessário
-    6. Use um tom educacional, paciente e encorajador
+    2. Comece conectando o tópico com conceitos que o estudante já conhece
+    3. Apresente a explicação de forma clara e estruturada, adaptada ao nível do estudante
+    4. Use analogias e metáforas para tornar o conceito mais acessível
+    5. Inclua exemplos práticos para ilustrar o conceito
+    6. Forneça exercícios para praticar, com suas respectivas soluções
+    7. Inclua perguntas reflexivas que estimulem o pensamento crítico
+    8. Encoraje o estudante a fazer perguntas adicionais se necessário
+    9. Use um tom educacional, paciente e encorajador
+    10. Termine com uma síntese que conecte todos os conceitos apresentados
 
     Resposta:
     """)
@@ -379,6 +399,35 @@ def tutor_response_generator(state: AcademicAgentState) -> AcademicAgentState:
     llm = ChatOpenAI(model=LLM_MODEL, temperature=LLM_TEMPERATURE_CREATIVE)
 
     try:
+        # Prepare knowledge level
+        knowledge_level = "iniciante"
+        if state.get("prior_knowledge"):
+            knowledge_level = state["prior_knowledge"].get("level", "iniciante")
+
+        # Prepare concept map section
+        concept_map_section = ""
+        if state.get("concept_map"):
+            concept_map_section = "Mapa conceitual:\n" + state["concept_map"].get("text_representation", "")
+
+        # Prepare bridging explanation section
+        bridging_explanation_section = ""
+        if state.get("bridging_explanation"):
+            bridging_explanation_section = "Explicação conectando conhecimentos prévios:\n" + state["bridging_explanation"]
+
+        # Prepare multi-level explanation section
+        multi_level_explanation_section = ""
+        if state.get("multi_level_explanation"):
+            recommended_level = state["multi_level_explanation"].get("recommended_level", "básico")
+
+            if recommended_level == "avançado":
+                explanation_text = state["multi_level_explanation"].get("advanced", {}).get("explanation", "")
+            elif recommended_level == "intermediário":
+                explanation_text = state["multi_level_explanation"].get("intermediate", {}).get("explanation", "")
+            else:
+                explanation_text = state["multi_level_explanation"].get("basic", {}).get("explanation", "")
+
+            multi_level_explanation_section = f"Explicação ({recommended_level}):\n{explanation_text}"
+
         # Prepare examples section
         examples_section = ""
         if state.get("examples"):
@@ -399,12 +448,23 @@ def tutor_response_generator(state: AcademicAgentState) -> AcademicAgentState:
                     examples_section += f"{i+1}. Pergunta: {exercise.get('question', '')}\n"
                     examples_section += f"   Solução: {exercise.get('solution', '')}\n"
 
+        # Prepare Socratic questions section
+        socratic_questions_section = ""
+        if state.get("socratic_questions"):
+            socratic_questions_section = "Perguntas para reflexão:\n"
+            for i, question in enumerate(state["socratic_questions"][:3]):  # Limit to 3 questions
+                socratic_questions_section += f"{i+1}. {question.get('question', '')}\n"
+
         # Prepare inputs
         inputs = {
             "query": state["user_query"],
             "subject": state.get("subject", "desconhecida"),
-            "explanation": state.get("explanation", "Não foi possível gerar uma explicação."),
-            "examples_section": examples_section
+            "knowledge_level": knowledge_level,
+            "concept_map_section": concept_map_section,
+            "bridging_explanation_section": bridging_explanation_section,
+            "multi_level_explanation_section": multi_level_explanation_section,
+            "examples_section": examples_section,
+            "socratic_questions_section": socratic_questions_section
         }
 
         # Execute the generation
@@ -497,13 +557,37 @@ def tutor_agent(state: AcademicAgentState) -> AcademicAgentState:
     # Step 1: Classify subject and topic
     state = subject_classifier(state)
 
-    # Step 2: Generate explanation
-    state = explanation_generator(state)
+    # Step 2: Assess prior knowledge (from adaptive_tutor)
+    state = assess_prior_knowledge(state)
 
-    # Step 3: Generate examples and exercises
+    # Step 3: Identify related concepts (from knowledge_connector)
+    state = identify_related_concepts(state)
+
+    # Step 4: Create concept map (from knowledge_connector)
+    state = create_concept_map(state)
+
+    # Step 5: Generate multi-level explanation (from adaptive_tutor)
+    state = generate_multi_level_explanation(state)
+
+    # Step 6: Generate bridging explanation (from knowledge_connector)
+    state = generate_bridging_explanation(state)
+
+    # Step 7: Generate Socratic questions (from socratic_tutor)
+    state = generate_socratic_questions(state)
+
+    # Step 8: Create Socratic dialogue (from socratic_tutor)
+    state = create_socratic_dialogue(state)
+
+    # Step 9: Generate examples and exercises
     state = example_generator(state)
 
-    # Step 4: Generate response
-    state = tutor_response_generator(state)
+    # Step 10: Determine the best response approach based on the query and context
+    if "socratic" in state["user_query"].lower() or state.get("prior_knowledge", {}).get("level") == "avançado":
+        # Use Socratic approach for advanced students or when explicitly requested
+        state = generate_socratic_response(state)
+        state["natural_response"] = state.get("socratic_response", "")
+    else:
+        # Use standard approach with enhanced explanations
+        state = tutor_response_generator(state)
 
     return state

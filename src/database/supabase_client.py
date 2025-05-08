@@ -45,6 +45,9 @@ def get_schema_info() -> Dict[str, Any]:
             print(f"RPC method failed, falling back to direct queries: {str(rpc_error)}")
             schema_info = get_schema_info_direct()
 
+        # Enriquecer o esquema com amostras de valores para colunas importantes
+        schema_info = enrich_schema_with_samples(schema_info)
+
         # Cache the schema
         set_cache(cache_key, schema_info, SCHEMA_CACHE_TTL)
 
@@ -53,6 +56,48 @@ def get_schema_info() -> Dict[str, Any]:
         # Return a minimal schema if there's an error
         print(f"Error fetching schema: {str(e)}")
         return {"tables": [], "error": str(e)}
+
+def enrich_schema_with_samples(schema_info: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Enriquece o esquema do banco de dados com amostras de valores para colunas importantes.
+
+    Args:
+        schema_info (Dict[str, Any]): Informações do esquema do banco de dados
+
+    Returns:
+        Dict[str, Any]: Esquema enriquecido com amostras de valores
+    """
+    # Definir colunas importantes para obter amostras
+    important_columns = [
+        {"table": "matriculas", "column": "status"},
+        {"table": "periodos_letivos", "column": "status"},
+        {"table": "financeiro", "column": "status"},
+        {"table": "disciplinas", "column": "nome"}
+    ]
+
+    # Inicializar dicionário de amostras
+    if "column_samples" not in schema_info:
+        schema_info["column_samples"] = {}
+
+    # Obter amostras para cada coluna importante
+    for item in important_columns:
+        table_name = item["table"]
+        column_name = item["column"]
+
+        # Verificar se a tabela existe no esquema
+        table_exists = any(table["name"] == table_name for table in schema_info.get("tables", []))
+        if not table_exists:
+            continue
+
+        # Obter amostras de valores
+        sample_values = get_column_values_sample(table_name, column_name)
+
+        # Adicionar ao esquema
+        if sample_values:
+            key = f"{table_name}.{column_name}"
+            schema_info["column_samples"][key] = sample_values
+
+    return schema_info
 
 def get_schema_info_direct() -> Dict[str, Any]:
     """
@@ -162,6 +207,44 @@ def get_schema_info_direct() -> Dict[str, Any]:
         # Fall back to a minimal schema
         return get_fallback_schema()
 
+def get_column_values_sample(table_name: str, column_name: str) -> List[str]:
+    """
+    Obtém uma amostra dos valores distintos em uma coluna específica.
+
+    Args:
+        table_name (str): Nome da tabela
+        column_name (str): Nome da coluna
+
+    Returns:
+        List[str]: Lista de valores distintos na coluna
+    """
+    try:
+        # Consulta segura para obter valores distintos
+        query = f"SELECT DISTINCT {column_name} FROM {table_name} LIMIT 10"
+
+        # Executar via RPC segura
+        response = supabase.rpc(
+            'execute_secured_query',
+            {
+                "query_text": query,
+                "params": "{}",
+                "user_id": "system"  # Usar um ID de sistema para consultas de metadados
+            }
+        ).execute()
+
+        if hasattr(response, 'error') and response.error:
+            print(f"Error getting column values: {response.error}")
+            return []
+
+        # Extrair valores distintos
+        values = [row.get(column_name) for row in response.data if row.get(column_name)]
+        print(f"Sample values for {table_name}.{column_name}: {values}")
+        return values
+
+    except Exception as e:
+        print(f"Error getting column values: {str(e)}")
+        return []
+
 def get_fallback_schema() -> Dict[str, Any]:
     """
     Returns a fallback schema when automatic schema retrieval fails.
@@ -260,7 +343,7 @@ def sanitize_and_parameterize_sql(sql: str, user_context: Dict[str, Any]) -> Tup
     # Ensure user_context is not None
     if user_context is None:
         user_context = {}
-        
+
     # Verificar e substituir {RA} pelo valor adequado
     if "{RA}" in sql:
         if "user_id" in user_context:
@@ -270,10 +353,25 @@ def sanitize_and_parameterize_sql(sql: str, user_context: Dict[str, Any]) -> Tup
         elif "RA" in user_context:
             sql = sql.replace("{RA}", ":ra")
             params["ra"] = user_context["RA"]
+        elif "ra" in user_context:
+            sql = sql.replace("{RA}", ":ra")
+            params["ra"] = user_context["ra"]
         else:
             # Valor padrão para testes
             sql = sql.replace("{RA}", ":ra")
             params["ra"] = user_id if 'user_id' in locals() else "201268"
+
+    # Verificar se o SQL contém :RA diretamente (sem chaves)
+    if ":RA" in sql:
+        if "user_id" in user_context:
+            params["RA"] = user_context["user_id"]
+        elif "RA" in user_context:
+            params["RA"] = user_context["RA"]
+        elif "ra" in user_context:
+            params["RA"] = user_context["ra"]
+        else:
+            # Valor padrão para testes
+            params["RA"] = user_id if 'user_id' in locals() else "201268"
 
     # Verificar se o SQL contém um placeholder para o RA (m.ra = ?)
     if "m.ra = ?" in sql or "ra = ?" in sql:
@@ -286,7 +384,7 @@ def sanitize_and_parameterize_sql(sql: str, user_context: Dict[str, Any]) -> Tup
         # Se não tiver nenhum desses, use o valor hardcoded para testes
         else:
             params["ra"] = user_id if 'user_id' in locals() else "201268"  # Valor padrão para testes
-    
+
     # Replace {{user_id}} with :user_id parameter
     if "{{user_id}}" in sql:
         if "user_id" in user_context:
@@ -356,15 +454,15 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
         # Log the query and parameters for debugging
         print(f"Executing query: {sql}")
         print(f"With parameters: {params}")
-        
+
         # Remover o LIMIT da consulta se estiver presente - corrige o erro de sintaxe
         final_query = re.sub(r'\bLIMIT\s+\d+\s*;?$', '', sql)
-        
+
         # Substituir parâmetros nomeados (:param)
         for key, value in params.items():
             if value is None:
                 continue
-                
+
             # Formatar o valor adequadamente para SQL
             if isinstance(value, str):
                 formatted_value = f"'{value}'"
@@ -374,13 +472,17 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
                 formatted_value = 'TRUE' if value else 'FALSE'
             else:
                 formatted_value = f"'{str(value)}'"
-                
-            # Substituir placeholders nomeados
-            final_query = final_query.replace(f":{key}", formatted_value)
-        
+
+            # Substituir placeholders nomeados (case-insensitive)
+            final_query = re.sub(f":{key}\\b", formatted_value, final_query, flags=re.IGNORECASE)
+
+            # Também substituir :RA se o parâmetro for 'ra'
+            if key.lower() == 'ra':
+                final_query = re.sub(f":RA\\b", formatted_value, final_query)
+
         # Verificar por padrões como {RA} ou outras variáveis entre chaves
         variables = re.findall(r'\{(\w+)\}', final_query)
-        
+
         for var in variables:
             var_value = None
             # Tentar obter o valor do parâmetro correspondente
@@ -392,7 +494,7 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
             # Se não encontrou, usar o user_id como fallback para RA
             elif var == "RA" or var == "ra":
                 var_value = user_id
-                
+
             # Substituir a variável se tiver um valor
             if var_value is not None:
                 final_query = final_query.replace(f"{{{var}}}", f"'{var_value}'")
@@ -423,14 +525,14 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
                 # Substituir placeholders de RA
                 final_query = final_query.replace("m.ra = ?", f"m.ra = '{params['ra']}'")
                 final_query = final_query.replace("ra = ?", f"ra = '{params['ra']}'")
-            
+
             # Remover qualquer ? remanescente que possa causar erro
             final_query = re.sub(r'\s*=\s*\?', " IS NOT NULL", final_query)
-            
+
             # Remover o parâmetro ra já que o substituímos diretamente na consulta
             if "ra" in params:
                 del params["ra"]
-        
+
         # Execute the query via a secure RPC function
         try:
             # Preparar os parâmetros para a chamada RPC
@@ -454,7 +556,7 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
 
             print(f"Query executed successfully. Response: {response.data}")
             return response.data or []
-        
+
         except Exception as e:
             print(f"Error executing query via RPC: {str(e)}")
             print("Falling back to simulated response for testing")
@@ -463,7 +565,7 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
             if "matriculas" in sql and "faltas" in sql:
                 # Determinar qual disciplina está sendo consultada
                 disciplina_nome = None
-                
+
                 # Tentar identificar a disciplina pelo nome
                 if "Sistemas Operacionais" in sql:
                     disciplina_nome = "Sistemas Operacionais"
@@ -525,7 +627,7 @@ def execute_query(sql: str, params: Dict[str, Any], user_id: str) -> List[Dict[s
                 import datetime
                 hoje = datetime.date.today()
                 vencimento = (hoje - datetime.timedelta(days=5)).strftime("%Y-%m-%d")
-                
+
                 # Simular um boleto vencido
                 return [{
                     "id": "ed7aaf56-8b34-4bc9-9f2d-91c1e4b24e79",

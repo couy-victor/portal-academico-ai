@@ -29,6 +29,12 @@ def executor_agent(state: AcademicAgentState) -> AcademicAgentState:
                 state["query_results"] = []
         return state
 
+    # Verificar se temos SQL para executar
+    if "generated_sql" not in state or not state["generated_sql"]:
+        logger.warning("No SQL to execute, setting empty results")
+        state["query_results"] = []
+        return state
+
     try:
         # Sanitize and parameterize SQL
         sanitized_sql, params = sanitize_and_parameterize_sql(

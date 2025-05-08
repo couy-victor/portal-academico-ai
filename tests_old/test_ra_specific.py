@@ -27,7 +27,7 @@ def test_ra_specific():
 
     # Define test queries
     test_queries = [
-        "Quem é o meu professor da disciplina de Circuitos Digitais?"
+        "como é feito o calculo para a nota?"
     ]
 
     # Define the RA (student ID) to test with

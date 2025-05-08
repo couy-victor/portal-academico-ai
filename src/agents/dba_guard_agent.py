@@ -19,7 +19,17 @@ def dba_guard(state: AcademicAgentState) -> AcademicAgentState:
         AcademicAgentState: Updated state with optimized SQL
     """
     # Skip if we already have an error, coming from cache, or if we should skip validation
-    if state.get("error") or state.get("from_cache", False) or state.get("skip_sql_generation", False):
+    if state.get("error") or state.get("from_cache", False) or state.get("skip_sql_generation", False) or state.get("skip_database_query", False):
+        # Garantir que temos um SQL dummy para evitar erros nos próximos agentes
+        if (state.get("skip_sql_generation", False) or state.get("skip_database_query", False)) and ("generated_sql" not in state or not state["generated_sql"]):
+            state["generated_sql"] = "SELECT 1 AS dummy"
+            logger.info("Setting dummy SQL in DBA Guard for skipped SQL generation")
+        return state
+
+    # Verificar se temos SQL para otimizar
+    if "generated_sql" not in state or not state["generated_sql"]:
+        logger.warning("No SQL to optimize in DBA Guard, setting dummy SQL")
+        state["generated_sql"] = "SELECT 1 AS dummy"
         return state
 
     try:
