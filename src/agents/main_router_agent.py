@@ -12,7 +12,7 @@ from src.config.settings import LLM_MODEL, LLM_TEMPERATURE
 from src.models.state import AcademicAgentState
 from src.utils.logging import logger
 
-def main_router_agent(state: AcademicAgentState) -> List[str]:
+def main_router_agent(state: AcademicAgentState) -> Dict[str, Any]:
     """
     Routes queries to the appropriate specialized agent.
 
@@ -20,11 +20,11 @@ def main_router_agent(state: AcademicAgentState) -> List[str]:
         state (AcademicAgentState): Current state
 
     Returns:
-        List[str]: List of next nodes to route to
+        Dict[str, Any]: Dictionary containing the next node to route to
     """
     # Skip if we already have an error or coming from cache
     if state.get("error") or state.get("from_cache", False):
-        return ["intent_router"]  # Default to academic route
+        return {"next": "intent_router"}  # Default to academic route
 
     # Create prompt for main routing
     prompt = ChatPromptTemplate.from_template("""
@@ -95,13 +95,13 @@ def main_router_agent(state: AcademicAgentState) -> List[str]:
         # Return the appropriate next node based on the category
         category = result["category"]
         if category == "emotional_support":
-            return ["emotional_support"]
+            return {"next": "emotional_support"}
         elif category == "tutor":
-            return ["tutor"]
+            return {"next": "tutor"}
         elif category == "planning":
-            return ["planning"]
+            return {"next": "planning"}
         else:  # Default to academic
-            return ["intent_router"]
+            return {"next": "intent_router"}
 
     except Exception as e:
         error_msg = f"Error in main routing: {str(e)}"
@@ -116,4 +116,4 @@ def main_router_agent(state: AcademicAgentState) -> List[str]:
         state["metadata"]["main_routing_error"] = error_msg
 
         # Default to academic route
-        return ["intent_router"]
+        return {"next": "intent_router"}

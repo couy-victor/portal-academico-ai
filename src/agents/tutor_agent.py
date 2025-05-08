@@ -554,6 +554,16 @@ def tutor_agent(state: AcademicAgentState) -> AcademicAgentState:
     if state.get("error") or state.get("from_cache", False):
         return state
 
+    # Check if the query has the [socratic] prefix and remove it for processing
+    original_query = state["user_query"]
+    use_socratic_approach = False
+
+    if "[socratic]" in original_query.lower():
+        # Remove the [socratic] prefix for better processing
+        state["user_query"] = original_query.replace("[socratic]", "").strip()
+        use_socratic_approach = True
+        logger.info(f"Socratic approach requested: {state['user_query']}")
+
     # Step 1: Classify subject and topic
     state = subject_classifier(state)
 
@@ -582,12 +592,24 @@ def tutor_agent(state: AcademicAgentState) -> AcademicAgentState:
     state = example_generator(state)
 
     # Step 10: Determine the best response approach based on the query and context
-    if "socratic" in state["user_query"].lower() or state.get("prior_knowledge", {}).get("level") == "avançado":
-        # Use Socratic approach for advanced students or when explicitly requested
-        state = generate_socratic_response(state)
-        state["natural_response"] = state.get("socratic_response", "")
+    if use_socratic_approach or state.get("prior_knowledge", {}).get("level") == "avançado":
+        try:
+            # Use Socratic approach for advanced students or when explicitly requested
+            state = generate_socratic_response(state)
+            if state.get("socratic_response"):
+                state["natural_response"] = state["socratic_response"]
+            else:
+                # Fallback to standard response if socratic response generation failed
+                logger.info("Falling back to standard response due to missing socratic response")
+                state = tutor_response_generator(state)
+        except Exception as e:
+            logger.error(f"Error in socratic response generation: {str(e)}. Falling back to standard response.")
+            state = tutor_response_generator(state)
     else:
         # Use standard approach with enhanced explanations
         state = tutor_response_generator(state)
+
+    # Restore original query
+    state["user_query"] = original_query
 
     return state
