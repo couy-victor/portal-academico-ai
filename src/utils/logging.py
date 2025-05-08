@@ -23,28 +23,29 @@ logger = logging.getLogger("academic_agent")
 langsmith_client = None
 if TRACING_ENABLED and LANGSMITH_API_KEY:
     try:
-        langsmith_client = Client(
-            api_key=LANGSMITH_API_KEY,
-            project_name=LANGSMITH_PROJECT
-        )
+        # Versão compatível com diferentes versões do LangSmith
+        langsmith_client = Client(api_key=LANGSMITH_API_KEY)
+        # Definir o projeto separadamente se o método existir
+        if hasattr(langsmith_client, 'set_project'):
+            langsmith_client.set_project(LANGSMITH_PROJECT)
     except Exception as e:
         logger.error(f"Failed to initialize LangSmith client: {str(e)}")
 
 def log_interaction(state: Dict[str, Any], run_id: Optional[str] = None) -> str:
     """
     Logs an interaction to both local logs and LangSmith if enabled.
-    
+
     Args:
         state (Dict[str, Any]): The current state
         run_id (Optional[str]): Existing run ID for updates
-        
+
     Returns:
         str: The run ID
     """
     # Generate a new run ID if not provided
     if not run_id:
         run_id = str(uuid.uuid4())
-    
+
     # Extract key information for logging
     log_data = {
         "run_id": run_id,
@@ -57,13 +58,13 @@ def log_interaction(state: Dict[str, Any], run_id: Optional[str] = None) -> str:
         "from_cache": state.get("from_cache", False),
         "response": state.get("natural_response", "")
     }
-    
+
     # Log locally
     if state.get("error"):
         logger.error(f"Interaction {run_id}: Error - {state['error']}")
     else:
         logger.info(f"Interaction {run_id}: {state.get('user_query', '')} -> {state.get('intent', 'unknown')}")
-    
+
     # Log to LangSmith if enabled
     if TRACING_ENABLED and langsmith_client:
         try:
@@ -77,5 +78,5 @@ def log_interaction(state: Dict[str, Any], run_id: Optional[str] = None) -> str:
             )
         except Exception as e:
             logger.error(f"Failed to log to LangSmith: {str(e)}")
-    
+
     return run_id
