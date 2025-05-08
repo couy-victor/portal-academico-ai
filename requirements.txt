@@ -1,13 +1,15 @@
-pip install langchain
-pip install langchain-openai
-pip install langgraph
-pip install langchain-community
-pip install streamlit
-pip install supabase
-pip install python-dotenv
-pip install tavily-python
-pip install pypdf2
-pip install faiss-cpu
-pip install unstructured
-pip install rank-bm25
-pip install pydantic
+langchain
+langchain-openai
+langgraph
+langchain-community
+streamlit
+supabase
+python-dotenv
+tavily-python
+pypdf2
+faiss-cpu
+unstructured
+rank-bm25
+pydantic
+langchain-core
+langchain-groq
