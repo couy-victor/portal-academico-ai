@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import json
 import sys
+import base64
 from dotenv import load_dotenv
 
 # Adicionar o diretório raiz ao path para importações
@@ -14,6 +15,7 @@ try:
     from src.agents.emotional_support_agent import emotional_support_agent
     from src.agents.tutor_agent import tutor_agent
     from src.agents.planning_agent import planning_agent
+    from src.agents.financial_agent import financial_agent
     from src.graph.academic_graph import create_academic_graph
 
     # Flag para indicar que as importações foram bem-sucedidas
@@ -44,6 +46,45 @@ def initialize_agent_state(query, ra):
         user_context={"RA": ra}
     )
 
+def display_pdf_download_buttons(pdf_paths):
+    """
+    Exibe botões para download de PDFs.
+
+    Args:
+        pdf_paths (list): Lista de caminhos para arquivos PDF
+    """
+    st.markdown("### Boletos Disponíveis para Download")
+
+    for i, pdf_path in enumerate(pdf_paths):
+        try:
+            # Ler o arquivo PDF
+            with open(pdf_path, "rb") as file:
+                pdf_bytes = file.read()
+
+            # Obter o nome do arquivo
+            file_name = os.path.basename(pdf_path)
+
+            # Criar botão de download
+            st.download_button(
+                label=f"📄 Baixar Boleto {i+1}",
+                data=pdf_bytes,
+                file_name=file_name,
+                mime="application/pdf",
+                key=f"download_pdf_{i}"
+            )
+
+            # Exibir visualização do PDF (opcional)
+            with st.expander(f"Visualizar Boleto {i+1}"):
+                # Codificar o PDF em base64
+                b64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+
+                # Exibir o PDF usando um iframe
+                pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="500" type="application/pdf"></iframe>'
+                st.markdown(pdf_display, unsafe_allow_html=True)
+
+        except Exception as e:
+            st.error(f"Erro ao processar o PDF {i+1}: {str(e)}")
+
 # Configuração da barra lateral
 with st.sidebar:
     st.title("Configurações")
@@ -54,7 +95,7 @@ with st.sidebar:
     # Seleção do agente
     agent_type = st.selectbox(
         "Selecione o tipo de assistente",
-        ["Acadêmico", "Suporte Emocional", "Tutor", "Planejamento Acadêmico"],
+        ["Acadêmico", "Suporte Emocional", "Tutor", "Planejamento Acadêmico", "Financeiro"],
         key="agent_type"
     )
 
@@ -85,11 +126,17 @@ with st.sidebar:
             "Como funciona a Lei de Ohm?",
             "O que são derivadas parciais?"
         ]
-    else:  # Planejamento Acadêmico
+    elif st.session_state.agent_type == "Planejamento Acadêmico":
         examples = [
             "Preciso organizar meus estudos para as provas finais",
             "Como posso criar um cronograma de estudos eficiente?",
             "Quais técnicas de estudo são mais eficazes?"
+        ]
+    else:  # Financeiro
+        examples = [
+            "Tenho boletos vencidos?",
+            "Quero ver meus boletos pendentes",
+            "Poderia me enviar o código do boleto?"
         ]
 
     for example in examples:
@@ -106,6 +153,7 @@ with st.sidebar:
     st.markdown("**Suporte Emocional**: Ajuda com ansiedade, estresse, etc.")
     st.markdown("**Tutor**: Explicações sobre conteúdos acadêmicos")
     st.markdown("**Planejamento**: Ajuda com organização de estudos")
+    st.markdown("**Financeiro**: Consultas sobre boletos, mensalidades, etc.")
 
 # Título principal
 st.title("🎓 Portal Acadêmico AI")
@@ -160,6 +208,11 @@ if prompt := st.chat_input():
                 result = planning_agent(state)
                 response = result.get("natural_response", "Não foi possível processar sua consulta de planejamento.")
 
+            elif st.session_state.agent_type == "Financeiro":
+                # Usar o agente financeiro
+                result = financial_agent(state)
+                response = result.get("natural_response", "Não foi possível processar sua consulta financeira.")
+
             else:
                 response = "Por favor, selecione um tipo de assistente válido na barra lateral."
 
@@ -176,6 +229,34 @@ if prompt := st.chat_input():
     # Adicionar a resposta ao histórico
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.chat_message("assistant").write(response)
+
+    # Exibir botões de download de PDFs se houver boletos disponíveis
+    if 'result' in locals():
+        # Verificar se é uma consulta sobre boletos (em qualquer agente)
+        if "boleto" in prompt.lower() or "vencido" in prompt.lower() or "mensalidade" in prompt.lower():
+            # Processar boletos
+            from src.utils.boleto_generator import obter_boletos_vencidos
+
+            try:
+                # Obter RA do aluno
+                ra = st.session_state.student_ra
+
+                # Obter nome do aluno (fictício para demonstração)
+                nome_aluno = "Estudante da UNISAL"
+
+                # Obter boletos vencidos
+                boletos = obter_boletos_vencidos(ra, nome_aluno, quantidade=3)
+
+                # Exibir botões de download
+                if boletos:
+                    pdf_paths = [boleto["pdf_path"] for boleto in boletos]
+                    display_pdf_download_buttons(pdf_paths)
+            except Exception as e:
+                st.warning(f"Não foi possível gerar os PDFs dos boletos: {str(e)}")
+
+        # Verificar se o agente financeiro retornou PDFs
+        elif st.session_state.agent_type == "Financeiro" and result.get("has_pdf_attachments", False) and result.get("pdf_attachments"):
+            display_pdf_download_buttons(result.get("pdf_attachments", []))
 
     # Exibir informações de depuração (opcional)
     with st.expander("Informações de Depuração"):
