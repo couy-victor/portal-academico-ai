@@ -101,7 +101,29 @@ with st.sidebar:
 
     # Botão para limpar o histórico
     if st.button("Limpar Conversa"):
-        st.session_state.messages = [{"role": "assistant", "content": "Olá! Como posso ajudar você hoje? Por favor, selecione o tipo de assistente na barra lateral e informe seu RA."}]
+        welcome_message = """
+        👋 Olá! Eu sou o Bosquinho, seu assistente acadêmico aqui na UNISAL!
+
+        Estou aqui para ajudar com:
+
+        • 📚 Informações acadêmicas (notas, faltas, disciplinas)
+
+        • 💰 Questões financeiras (boletos, mensalidades)
+
+        • 🧠 Tutoria em diversas disciplinas
+
+        • 😌 Suporte emocional para momentos difíceis
+
+        • 📅 Planejamento de estudos e organização
+
+        Para começar, por favor:
+        1. Digite seu RA na barra lateral
+        2. Selecione o tipo de assistente que deseja utilizar
+        3. Faça sua pergunta no campo abaixo
+
+        Como posso ajudar você hoje?
+        """
+        st.session_state.messages = [{"role": "assistant", "content": welcome_message}]
         st.rerun()
 
     # Exemplos de perguntas
@@ -156,12 +178,34 @@ with st.sidebar:
     st.markdown("**Financeiro**: Consultas sobre boletos, mensalidades, etc.")
 
 # Título principal
-st.title("🎓 Portal Acadêmico AI")
-st.caption("Assistente acadêmico inteligente para estudantes")
+st.title("🎓 Portal Acadêmico - Bosquinho")
+st.caption("Seu assistente acadêmico inteligente na UNISAL")
 
 # Inicializar o histórico de mensagens
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "Olá! Como posso ajudar você hoje? Por favor, selecione o tipo de assistente na barra lateral e informe seu RA."}]
+    welcome_message = """
+    👋 Olá! Eu sou o Bosquinho, seu assistente acadêmico aqui no UNISAL!
+
+    Estou aqui para ajudar com:
+
+    • 📚 Informações acadêmicas (notas, faltas, disciplinas)
+
+    • 💰 Questões financeiras (boletos, mensalidades)
+
+    • 🧠 Tutoria em diversas disciplinas
+
+    • 😌 Suporte emocional para momentos difíceis
+
+    • 📅 Planejamento de estudos e organização
+
+    Para começar, por favor:
+    1. Digite seu RA na barra lateral
+    2. Selecione o tipo de assistente que deseja utilizar
+    3. Faça sua pergunta no campo abaixo
+
+    Como posso ajudar você hoje?
+    """
+    st.session_state["messages"] = [{"role": "assistant", "content": welcome_message}]
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
