@@ -17,7 +17,6 @@ try:
     from src.agents.emotional_support_agent import emotional_support_agent
     from src.agents.tutor_agent import tutor_agent
     from src.agents.planning_agent import planning_agent
-    from src.agents.financial_agent import financial_agent
     from src.graph.academic_graph import create_academic_graph
 
     # Flag para indicar que as importações foram bem-sucedidas
@@ -97,7 +96,7 @@ with st.sidebar:
     # Seleção do agente
     agent_type = st.selectbox(
         "Selecione o tipo de assistente",
-        ["Acadêmico", "Suporte Emocional", "Tutor", "Planejamento Acadêmico", "Financeiro"],
+        ["Acadêmico", "Suporte Emocional", "Tutor", "Planejamento Acadêmico"],
         key="agent_type"
     )
 
@@ -201,12 +200,7 @@ with st.sidebar:
             "Como posso criar um cronograma de estudos eficiente?",
             "Quais técnicas de estudo são mais eficazes?"
         ]
-    else:  # Financeiro
-        examples = [
-            "Tenho boletos vencidos?",
-            "Quero ver meus boletos pendentes",
-            "Poderia me enviar o código do boleto?"
-        ]
+
 
     for example in examples:
         if st.button(example, key=f"example_{example}"):
@@ -222,7 +216,6 @@ with st.sidebar:
     st.markdown("**Suporte Emocional**: Ajuda com ansiedade, estresse, etc.")
     st.markdown("**Tutor**: Explicações sobre conteúdos acadêmicos")
     st.markdown("**Planejamento**: Ajuda com organização de estudos")
-    st.markdown("**Financeiro**: Consultas sobre boletos, mensalidades, etc.")
 
 # Título principal
 st.title("🎓 Portal Acadêmico - Bosquinho")
@@ -317,11 +310,6 @@ if prompt := st.chat_input():
                 # Usar o agente de planejamento
                 result = planning_agent(state)
                 response = result.get("natural_response", "Não foi possível processar sua consulta de planejamento.")
-
-            elif st.session_state.agent_type == "Financeiro":
-                # Usar o agente financeiro
-                result = financial_agent(state)
-                response = result.get("natural_response", "Não foi possível processar sua consulta financeira.")
 
             else:
                 response = "Por favor, selecione um tipo de assistente válido na barra lateral."
@@ -685,9 +673,7 @@ if prompt := st.chat_input():
             except Exception as e:
                 st.warning(f"Não foi possível gerar os PDFs dos boletos: {str(e)}")
 
-        # Verificar se o agente financeiro retornou PDFs
-        elif st.session_state.agent_type == "Financeiro" and result.get("has_pdf_attachments", False) and result.get("pdf_attachments"):
-            display_pdf_download_buttons(result.get("pdf_attachments", []))
+
 
     # Exibir informações de depuração (opcional)
     with st.expander("Informações de Depuração"):

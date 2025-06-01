@@ -27,14 +27,21 @@ implementa respostas específicas para essas situações, priorizando a seguran�
 e o encaminhamento imediato para serviços de apoio profissional.
 """
 import json
+import time
 from typing import Dict, Any, List
 
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
+from src.agents.base_agent import LLMAgent
+from src.config.agent_config import config_manager
 from src.config.settings import LLM_MODEL, LLM_TEMPERATURE_CREATIVE
 from src.models.state import AcademicAgentState
+from src.mcp.integration import with_mcp_context, ContextType
 from src.utils.logging import logger
+from src.utils.validation import input_validator
+from src.utils.metrics import metrics_collector
+from src.utils.error_handling import LLMError
 
 def high_risk_message_detector(state: AcademicAgentState) -> AcademicAgentState:
     """
@@ -791,3 +798,245 @@ def emotional_support_agent(state: AcademicAgentState) -> AcademicAgentState:
     state = emotional_response_generator(state)
 
     return state
+
+
+class EmotionalSupportAgent(LLMAgent):
+    """
+    Enhanced Emotional Support Agent with advanced features:
+    - Emotional pattern tracking and analysis
+    - Personalized intervention strategies
+    - Progress monitoring and follow-up
+    - Crisis escalation protocols
+    - Contextual emotional intelligence
+    """
+
+    def __init__(self):
+        """Initialize the Enhanced Emotional Support Agent."""
+        super().__init__(
+            name="emotional_support",
+            description="Provides advanced emotional support with personalized tracking and crisis intervention",
+            temperature=0.7  # Higher temperature for more empathetic responses
+        )
+
+        # Get agent configuration
+        self.config = config_manager.get_agent_config("emotional_support")
+        if self.config:
+            self.timeout_seconds = self.config.timeout_seconds
+            self.custom_settings = self.config.custom_settings
+        else:
+            self.timeout_seconds = 30
+            self.custom_settings = {}
+
+        # Enhanced emotional intelligence features
+        self.emotional_patterns = {}  # Track emotional patterns per user
+        self.intervention_history = {}  # Track intervention effectiveness
+        self.crisis_protocols = {
+            "high_risk_keywords": [
+                "suicídio", "suicida", "me matar", "quero morrer", "tirar minha vida",
+                "acabar com tudo", "não quero mais viver", "automutilação", "me cortar"
+            ],
+            "escalation_threshold": 3,  # Number of high-risk interactions before escalation
+            "follow_up_intervals": [24, 72, 168]  # Hours: 1 day, 3 days, 1 week
+        }
+
+    @with_mcp_context([ContextType.USER_PROFILE, ContextType.CONVERSATION])
+    def _execute(self, state: AcademicAgentState) -> AcademicAgentState:
+        """
+        Execute the emotional support logic with MCP context.
+
+        Args:
+            state (AcademicAgentState): Current state
+
+        Returns:
+            AcademicAgentState: Updated state with emotional support
+        """
+        # Validate input
+        validation_result = input_validator.validate_user_query(state["user_query"])
+        if not validation_result.is_valid:
+            raise LLMError(f"Invalid query: {', '.join(validation_result.errors)}")
+
+        # Record metrics
+        start_time = time.time()
+
+        try:
+            # Step 1: Detect emotional state with high-risk detection
+            state = self._detect_emotional_state(state)
+
+            # Step 2: Generate strategies
+            if not state.get("error"):
+                state = self._generate_strategies(state)
+
+            # Step 3: Recommend resources
+            if not state.get("error"):
+                state = self._recommend_resources(state)
+
+            # Step 4: Generate empathetic response
+            if not state.get("error"):
+                state = self._generate_response(state)
+
+            # Record successful execution
+            execution_time = time.time() - start_time
+            metrics_collector.record_agent_execution(
+                self.name, execution_time, True, False
+            )
+
+            logger.info(f"Emotional support completed for emotional state: {state.get('emotional_state', 'unknown')}")
+
+            return state
+
+        except Exception as e:
+            execution_time = time.time() - start_time
+            metrics_collector.record_agent_execution(
+                self.name, execution_time, False, False, str(type(e).__name__)
+            )
+            raise LLMError(f"Emotional support failed: {str(e)}")
+
+    def _detect_emotional_state(self, state: AcademicAgentState) -> AcademicAgentState:
+        """Enhanced emotional state detection with pattern tracking."""
+        # First, use existing high-risk detection
+        state = high_risk_message_detector(state)
+
+        # Track emotional patterns for this user
+        user_id = state.get("user_id", "unknown")
+        self._track_emotional_pattern(user_id, state)
+
+        # Add contextual emotional intelligence
+        state = self._add_emotional_context(state)
+
+        return state
+
+    def _generate_strategies(self, state: AcademicAgentState) -> AcademicAgentState:
+        """Generate personalized emotional support strategies."""
+        # Use existing strategy generator
+        state = strategy_generator(state)
+
+        # Enhance with personalized strategies based on history
+        state = self._personalize_strategies(state)
+
+        return state
+
+    def _recommend_resources(self, state: AcademicAgentState) -> AcademicAgentState:
+        """Recommend personalized emotional support resources."""
+        # Use existing resource recommender
+        state = resource_recommender(state)
+
+        # Add personalized resources based on user profile and history
+        state = self._add_personalized_resources(state)
+
+        return state
+
+    def _generate_response(self, state: AcademicAgentState) -> AcademicAgentState:
+        """Generate contextually aware empathetic response."""
+        # Check if this requires crisis intervention
+        if self._requires_crisis_intervention(state):
+            state = self._generate_crisis_response(state)
+        else:
+            # Use existing response generator
+            state = emotional_response_generator(state)
+
+            # Enhance with follow-up planning
+            state = self._add_followup_plan(state)
+
+        return state
+
+    def _track_emotional_pattern(self, user_id: str, state: AcademicAgentState) -> None:
+        """Track emotional patterns for personalized support."""
+        if user_id not in self.emotional_patterns:
+            self.emotional_patterns[user_id] = {
+                "interactions": [],
+                "common_triggers": [],
+                "effective_strategies": [],
+                "risk_level": "low"
+            }
+
+        # Add current interaction
+        interaction = {
+            "timestamp": time.time(),
+            "emotional_state": state.get("emotional_state", "unknown"),
+            "severity": state.get("emotional_severity", "unknown"),
+            "triggers": self._extract_triggers(state.get("user_query", "")),
+            "high_risk": state.get("metadata", {}).get("high_risk_message", False)
+        }
+
+        self.emotional_patterns[user_id]["interactions"].append(interaction)
+
+        # Update risk level based on recent patterns
+        self._update_risk_level(user_id)
+
+        logger.info(f"Tracked emotional pattern for user {user_id}: {state.get('emotional_state', 'unknown')}")
+
+    def _extract_triggers(self, query: str) -> list:
+        """Extract emotional triggers from user query."""
+        triggers = []
+        trigger_keywords = {
+            "academic_pressure": ["prova", "exame", "nota", "reprovação", "deadline"],
+            "social_anxiety": ["apresentação", "grupo", "colegas", "vergonha"],
+            "perfectionism": ["perfeito", "erro", "falha", "não conseguir"],
+            "time_management": ["tempo", "prazo", "atrasado", "organização"],
+            "imposter_syndrome": ["não mereço", "sorte", "fingindo", "descobrir"]
+        }
+
+        query_lower = query.lower()
+        for trigger_type, keywords in trigger_keywords.items():
+            if any(keyword in query_lower for keyword in keywords):
+                triggers.append(trigger_type)
+
+        return triggers
+
+    def _update_risk_level(self, user_id: str) -> None:
+        """Update user risk level based on interaction patterns."""
+        interactions = self.emotional_patterns[user_id]["interactions"]
+        recent_interactions = [i for i in interactions if time.time() - i["timestamp"] < 604800]  # Last week
+
+        high_risk_count = sum(1 for i in recent_interactions if i["high_risk"])
+        severe_count = sum(1 for i in recent_interactions if i["severity"] == "alta")
+
+        if high_risk_count >= 2 or severe_count >= 3:
+            self.emotional_patterns[user_id]["risk_level"] = "high"
+        elif high_risk_count >= 1 or severe_count >= 2:
+            self.emotional_patterns[user_id]["risk_level"] = "medium"
+        else:
+            self.emotional_patterns[user_id]["risk_level"] = "low"
+
+    def _add_emotional_context(self, state: AcademicAgentState) -> AcademicAgentState:
+        """Add emotional context from MCP and user history."""
+        user_id = state.get("user_id", "unknown")
+        mcp_context = state.get("mcp_context", {})
+
+        # Add conversation history context
+        conversation_history = mcp_context.get("conversation_history", [])
+        if conversation_history:
+            state["emotional_context"] = {
+                "previous_interactions": len(conversation_history),
+                "recent_emotional_state": self._analyze_recent_emotions(conversation_history),
+                "conversation_tone": self._analyze_conversation_tone(conversation_history)
+            }
+
+        # Add user pattern context
+        if user_id in self.emotional_patterns:
+            pattern = self.emotional_patterns[user_id]
+            state["emotional_context"] = state.get("emotional_context", {})
+            state["emotional_context"].update({
+                "risk_level": pattern["risk_level"],
+                "common_triggers": pattern["common_triggers"],
+                "interaction_count": len(pattern["interactions"])
+            })
+
+        return state
+
+
+# Create agent instance
+emotional_support_agent_instance = EmotionalSupportAgent()
+
+
+def emotional_support_agent_new(state: AcademicAgentState) -> AcademicAgentState:
+    """
+    New emotional support agent function using the improved architecture.
+
+    Args:
+        state (AcademicAgentState): Current state
+
+    Returns:
+        AcademicAgentState: Updated state with emotional support
+    """
+    return emotional_support_agent_instance(state)

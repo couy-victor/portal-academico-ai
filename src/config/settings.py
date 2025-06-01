@@ -52,3 +52,19 @@ BM25_B = float(os.getenv("BM25_B", "0.75"))  # Parâmetro b do BM25
 # Tavily Configuration
 TAVILY_MAX_RESULTS = int(os.getenv("TAVILY_MAX_RESULTS", "5"))
 TAVILY_SEARCH_DEPTH = os.getenv("TAVILY_SEARCH_DEPTH", "basic")
+
+# MCP Configuration
+MCP_ENABLED = os.getenv("MCP_ENABLED", "True").lower() == "true"
+MCP_CONTEXT_TTL = int(os.getenv("MCP_CONTEXT_TTL", "3600"))  # 1 hour
+MCP_CLEANUP_INTERVAL = int(os.getenv("MCP_CLEANUP_INTERVAL", "300"))  # 5 minutes
+MCP_MAX_CONTEXT_SIZE = int(os.getenv("MCP_MAX_CONTEXT_SIZE", "1000000"))  # 1MB
+
+# Metrics Configuration
+METRICS_ENABLED = os.getenv("METRICS_ENABLED", "True").lower() == "true"
+METRICS_EXPORT_INTERVAL = int(os.getenv("METRICS_EXPORT_INTERVAL", "60"))  # 1 minute
+METRICS_RETENTION_DAYS = int(os.getenv("METRICS_RETENTION_DAYS", "7"))
+
+# Error Handling Configuration
+ERROR_RECOVERY_ENABLED = os.getenv("ERROR_RECOVERY_ENABLED", "True").lower() == "true"
+MAX_RECOVERY_ATTEMPTS = int(os.getenv("MAX_RECOVERY_ATTEMPTS", "3"))
+FALLBACK_RESPONSE_ENABLED = os.getenv("FALLBACK_RESPONSE_ENABLED", "True").lower() == "true"
