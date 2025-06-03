@@ -12,7 +12,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
-LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "academic-agent")
+LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "portal-academico-ai")
+LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "portal-academico-ai")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 # LLM Configuration
