@@ -64,8 +64,10 @@ def log_interaction(state: Dict[str, Any], run_id: Optional[str] = None) -> str:
     # Log to LangSmith if enabled
     if TRACING_ENABLED and langsmith_client:
         try:
+            logger.info(f"🔍 Enviando para LangSmith projeto: {LANGSMITH_PROJECT}")
+            
             # ✅ VERSÃO CORRETA: Usar create_run em vez de log_feedback
-            langsmith_client.create_run(
+            result = langsmith_client.create_run(
                 name="academic_agent_interaction",
                 run_type="chain",
                 project_name=LANGSMITH_PROJECT,
@@ -88,9 +90,13 @@ def log_interaction(state: Dict[str, Any], run_id: Optional[str] = None) -> str:
                 },
                 tags=["academic-agent", "interaction"]
             )
-            logger.debug(f"Successfully logged interaction {run_id} to LangSmith")
+            logger.info(f"✅ Sucesso! Run ID: {result}")
             
         except Exception as e:
-            logger.error(f"Failed to log to LangSmith: {str(e)}")
+            logger.error(f"❌ Erro LangSmith: {str(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+    else:
+        logger.info(f"🚫 LangSmith desabilitado: TRACING={TRACING_ENABLED}, client={langsmith_client is not None}")
     
     return run_id
