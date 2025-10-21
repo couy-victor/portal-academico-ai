@@ -1,0 +1,311 @@
+[16:03, 19/05/2025] Asla: mano achei bem dhora, talvez trazer o PDF do boleto, acho q vc já tinha falado disso
+[16:04, 19/05/2025] Victor Aarão Couy: Sim.... Boa!
+[16:04, 19/05/2025] Asla: e seria legal ter acesso à um report de como foi o meu mês, tipo quais matérias eu mais perguntei, sobre mais qual tópico eu falei com a ia
+[16:05, 19/05/2025] Asla: talvez uma página q a IA criei uma simulado de treino para fazer, com o usuário respondendo no próprio site e no final recebendo a resposta
+[16:06, 19/05/2025] Asla: n sei se seria muito trampo colocar perguntar dissertavas tb
+
+
+
+
+Tenho algumas melhorias sendo implementadas:
+
+Enviar o PDF do boleto.
+Um report para o aluno, mostrando como foi o mês dele. Quais materias ele mais perguntou, com topico ele mais conversou com a IA e etc. E um simulado para ajudar ele com possiveis treinos. 
+V1 INTERFACE VOZ, MICRO-CONTEUDOS (Notbook LM) 15 minutos, tempo ideial para prender atenção. Kan academy livro - forma de prender as pessoas. 
+
+Preciso me preparar para uma prova de Cálculo II em 5 dias. Tenho disponibilidade de 3 horas por dia para estudar. Os tópicos que preciso revisar são: integrais múltiplas, coordenadas polares e séries de Taylor.
+
+
+
+
+228773
+
+Olá! Como posso ajudar você hoje? Por favor, selecione o tipo de assistente na barra lateral e informe seu RA.
+
+Quantas faltas eu tenho na disciplina de Circuitos Digitais?
+
+Você tem 5 faltas na disciplina de Circuitos Digitais. Se precisar de mais informações ou ajuda adicional, estou à disposição!
+
+Quem é o professor da disciplina de Circuitos Digitais?
+
+O professor responsável pela disciplina de Circuitos Digitais é o Dr. André Luiz Costa. Se precisar de mais informações ou tiver outras dúvidas, estou à disposição para ajudar!
+
+Tenho boletos Vencidos? Se sim, poderia me enviar o codigo do boleto?
+
+Atualmente, você possui três boletos vencidos. Os códigos dos boletos são: "14193be3-37e0-4155-bce4-12dff00c7a1c", "80f7f0f7-7eba-45cd-86b4-75d3528f85c1" e "4590ac3a-4c9c-4471-affd-ff0014a9aec5". Recomendo verificar esses códigos e tomar as medidas necessárias para regularizar sua situação financeira. Caso precise de mais detalhes ou assistência, entre em contato com a instituição financeira responsável.
+
+Como é feito o calculo de nota?
+
+Para calcular a nota final em uma disciplina específica, considera-se a soma das notas A1, A2 e da Avaliação Integrada (AI), que juntas correspondem a 70% da média final. A Nota A1 e a Nota A2 têm um valor máximo de 4,0 pontos cada, enquanto a AI vale 2,0 pontos. Além disso, o Projeto Integrador compõe 30% da média final. Dessa forma, a combinação desses componentes com seus respectivos pesos determina a nota final da disciplina. Espero que essa explicação tenha ajudado!
+
+Estou muito ansioso com a semana de provas
+
+Olá! Primeiro, quero que saiba que é completamente normal sentir ansiedade durante a semana de provas. Isso demonstra o quanto você se importa com seu desempenho acadêmico, e estou aqui para oferecer apoio e compreensão.
+
+Seus sentimentos são válidos, e muitos outros estudantes também passam por isso. A pressão das provas pode ser intensa, mas lembre-se de que você não está sozinho nessa jornada.
+
+Aqui estão algumas estratégias que podem ajudar a gerenciar essa ansiedade:
+
+Planejamento e Organização: Tente criar um cronograma de estudos. Dividir o material em partes menores e estudar um pouco a cada dia pode tornar a tarefa menos assustadora.
+
+Técnicas de Relaxamento: Experimente práticas de respiração profunda, meditação ou yoga. Essas atividades podem ajudar a acalmar a mente e reduzir a tensão.
+
+Pausas Regulares: Estudar por longos períodos sem descanso pode aumentar o estresse. Faça pausas regulares para se alongar, caminhar ou simplesmente relaxar.
+
+Sono Adequado: Dormir bem é crucial para manter a mente clara e melhorar a retenção de informações. Tente garantir um horário de sono consistente.
+
+Alimentação e Hidratação: Comer bem e se manter hidratado pode ter um impacto positivo na sua energia e concentração.
+
+Se em algum momento a ansiedade parecer esmagadora, ou se você sentir que está atrapalhando seu dia a dia, considere procurar apoio profissional. Conversar com um conselheiro escolar ou um terapeuta pode oferecer novas perspectivas e estratégias personalizadas.
+
+Lembre-se de que é ok pedir ajuda. Estou torcendo por você e acredito no seu potencial para superar esse desafio. Boa sorte nas suas provas!
+
+Como funciona a Fisiopatologia do Infarto?
+
+Olá! Espero que você esteja bem e animado para aprender sobre a fisiopatologia do infarto. 😊
+
+Vamos começar conectando este tópico com algo que você provavelmente já conhece: o sistema circulatório. Você sabe que o coração é como uma bomba que mantém o sangue circulando pelo nosso corpo, levando oxigênio e nutrientes para todos os órgãos. Agora, imagine que essas "estradas" pelas quais o sangue passa, chamadas de artérias, são como tubos que podem ficar entupidos. É exatamente isso que pode levar ao infarto!
+
+1. O que é um infarto? Um infarto, também conhecido como ataque cardíaco, ocorre quando o fluxo de sangue para uma parte do coração é bloqueado. Isso geralmente acontece por causa de um acúmulo de gordura, colesterol e outras substâncias que formam uma placa nas artérias coronárias. Quando essa placa se rompe, um coágulo pode se formar, bloqueando o fluxo sanguíneo.
+
+2. Fisiopatologia do infarto: Pense no coração como um motor que nunca para de trabalhar. Para funcionar corretamente, ele precisa de um fornecimento constante de sangue rico em oxigênio. Quando uma parte do coração não recebe esse sangue, as células começam a morrer. Isso é um infarto.
+
+3. Analogias e Metáforas: Imagine que as artérias são como canos de água em uma casa. Se esses canos ficarem cheios de sujeira e lixo, a água não consegue passar. Da mesma forma, quando as artérias estão bloqueadas, o sangue não consegue chegar ao coração.
+
+4. Exemplos práticos: Pense em alguém que corre uma maratona. Eles precisam de energia constante, certo? Se de repente ficassem sem água ou comida, não conseguiriam continuar correndo. Da mesma forma, o coração precisa de um suprimento constante de sangue.
+
+5. Exercícios para praticar:
+
+Exercício 1: Desenhe um diagrama simples do coração e marque onde as artérias coronárias estão localizadas. Isso ajudará a visualizar onde o bloqueio acontece.
+
+Solução: Veja um diagrama básico do coração e localize as artérias coronárias ao redor do órgão.
+Exercício 2: Liste três fatores de risco para o desenvolvimento de placas nas artérias.
+
+Solução: Fatores comuns incluem colesterol alto, pressão alta e tabagismo.
+6. Perguntas reflexivas:
+
+Por que você acha que hábitos de vida saudáveis são importantes para prevenir um infarto?
+Como o corpo reage quando o coração não consegue bombear sangue de forma eficaz durante um infarto?
+7. Encorajamento: Não hesite em me fazer mais perguntas se algo ainda não estiver claro. Estou aqui para ajudar você a entender melhor esse assunto tão importante!
+
+8. Síntese: Em resumo, o infarto é causado por um bloqueio nas artérias que impedem o sangue de chegar ao coração. É como um cano entupido que impede a passagem da água. Compreender isso é o primeiro passo para reconhecer a importância de hábitos saudáveis e como eles podem prevenir problemas cardíacos.
+
+Espero que esta explicação tenha sido clara e útil. Estou aqui para qualquer dúvida que você tenha! 😊
+
+[socratic] Como funciona a Fisiopatologia do Infarto?
+
+Olá! Espero que você esteja tendo um ótimo dia. Estou aqui para ajudar você a entender melhor a fisiopatologia do infarto, e prometo que vamos explorar esse tema de uma maneira simples e interessante.
+
+Para começarmos, vamos conectar este tópico com algo que você já conhece. Imagine o sistema circulatório como uma rede de estradas e o coração como uma cidade central importante. O sangue é como os carros que transportam oxigênio e nutrientes (as "mercadorias") para todas as partes do corpo.
+
+O que é um Infarto?
+
+Um infarto, também conhecido como ataque cardíaco, ocorre quando uma parte do coração não recebe sangue suficiente. Isso é como se uma estrada importante que leva até a cidade central ficasse bloqueada, impedindo os carros de chegarem ao seu destino. Sem sangue suficiente, o músculo cardíaco começa a sofrer danos.
+
+Como isso acontece?
+
+Acúmulo de Placas: Com o tempo, placas de gordura, colesterol e outras substâncias podem se acumular nas paredes das artérias que levam sangue ao coração. Imagine isso como detritos que começam a bloquear uma estrada.
+
+Ruptura da Placa e Formação de Coágulo: Se uma dessas placas se rompe, o corpo tenta reparar o dano, mas acaba formando um coágulo. É como se, ao tentar consertar a estrada danificada, uma construção mal feita acabasse bloqueando a passagem dos carros.
+
+Obstrução do Fluxo Sanguíneo: O coágulo pode bloquear completamente o fluxo de sangue na artéria, resultando em um infarto.
+
+Exemplo Prático:
+
+Pense como se sua casa precisasse de eletricidade para funcionar, mas, de repente, a linha de energia fosse cortada. Sem eletricidade, a casa não pode funcionar corretamente. Da mesma forma, sem sangue, o coração não pode funcionar adequadamente.
+
+Exercícios para Praticar:
+
+Identifique as Partes: Desenhe um diagrama simples do coração e das artérias ao redor. Marque onde um bloqueio pode ocorrer e como isso afetaria o fluxo de sangue.
+
+Solução: As artérias coronárias são as principais vias que podem ser bloqueadas. Um bloqueio nelas pode impedir o sangue de chegar a partes do coração.
+
+Lista de Fatores de Risco: Faça uma lista de fatores que podem aumentar o risco de um infarto, como dieta rica em gorduras, falta de exercícios, tabagismo, etc.
+
+Solução: Fatores como obesidade, colesterol alto, pressão alta, fumo e histórico familiar são riscos conhecidos.
+
+Perguntas Reflexivas:
+
+O que você acha que poderia ser feito para prevenir a formação de placas nas artérias?
+Como mudanças no estilo de vida podem impactar a saúde do coração?
+Por favor, sinta-se à vontade para me fazer qualquer pergunta adicional que você tenha. Estou aqui para ajudar e quero garantir que você compreenda completamente este tópico.
+
+Para resumir, um infarto ocorre quando o fluxo de sangue para uma parte do coração é bloqueado, geralmente por um coágulo formado sobre uma placa de gordura. Isso pode ser comparado a uma estrada bloqueada, impedindo o transporte de mercadorias vitais. Compreender isso pode nos ajudar a tomar medidas para prevenir tais bloqueios e manter nosso "sistema de estradas" funcionando bem.
+
+Espero que esta explicação tenha sido útil para você! Estou aqui para ajudar, então não hesite em continuar nossa conversa.
+
+Preciso organizar meus estudos para as provas finais, eu trabalho das 09 da manha as 14 da tarde.
+
+Olá! É ótimo ver que você está comprometido em se preparar para suas provas finais, mesmo com uma agenda ocupada. Vamos montar um plano de estudo estruturado que se encaixe no seu horário e maximize seus resultados.
+
+1. Objetivo do Estudante
+Seu objetivo é organizar seus estudos para as provas finais, garantindo que você esteja bem preparado para alcançar o melhor desempenho possível.
+
+2. Plano de Estudo Estruturado
+Semana 1: Revisão Geral
+Segunda-feira a Sexta-feira (15h - 17h):
+
+Segunda-feira: Revise os tópicos mais recentes de cada matéria.
+Terça-feira: Organize seus materiais de estudo (notas, livros, slides).
+Quarta-feira: Identifique os tópicos que você considera mais difíceis.
+Quinta-feira: Reúna provas passadas e anote as áreas mais recorrentes.
+Sexta-feira: Resuma os pontos principais de cada matéria.
+Sábado e Domingo (10h - 13h e 15h - 17h):
+
+Foque em revisar um assunto específico por dia, alternando entre matérias.
+Realize exercícios práticos e resolva questões de provas anteriores.
+Semana 2: Foco em Tópicos Específicos
+Segunda-feira a Sexta-feira (15h - 17h):
+
+Escolha um tópico específico por dia para uma revisão mais profunda.
+Use técnicas como mapas mentais ou flashcards para memorização.
+Sábado e Domingo (10h - 13h e 15h - 17h):
+
+Simule uma prova com questões de diferentes tópicos.
+Revise suas respostas e identifique áreas para melhoria.
+Semana 3: Ajustes Finais e Revisão
+Segunda-feira a Quarta-feira (15h - 17h):
+
+Revise seus resumos e faça ajustes necessários.
+Tire dúvidas específicas com colegas ou professores.
+Quinta-feira e Sexta-feira (15h - 17h):
+
+Faça uma revisão geral e relaxe para evitar sobrecarga.
+Sábado e Domingo:
+
+Mantenha um horário leve de revisão e descanse adequadamente antes das provas.
+3. Datas/Prazos Sugeridos
+Início do Plano: Comece na segunda-feira da primeira semana e siga conforme o cronograma acima.
+Provas Finais: Ajuste o plano de acordo com a data específica das suas provas para garantir que toda a matéria foi coberta.
+4. Recursos Úteis
+Livros Didáticos e Notas de Aula: Para uma base sólida.
+Sites Educacionais e Vídeos Online: Como Khan Academy, YouTube.
+Aplicativos de Estudo: Anki para flashcards, Forest para foco.
+5. Dicas de Implementação
+Seja Consistente: Siga o cronograma diariamente.
+Crie um Ambiente de Estudo Livre de Distrações: Isso ajudará a melhorar a concentração.
+Faça Pausas Regulares: Use técnicas como Pomodoro para manter o foco sem se esgotar.
+Mantenha-se Motivado: Lembre-se dos seus objetivos e do que está tentando alcançar.
+Lembre-se, a chave para o sucesso é a consistência e a autocompaixão. Não se cobre demais e permita-se tempo para descansar e recarregar. Você está no caminho certo e tenho certeza de que alcançará seus objetivos. Boa sorte nas suas provas finais!
+
+Quantos campus o unisal possui? Possui algum intercambio em aberto?
+
+O UNISAL possui sete unidades no estado de São Paulo, localizadas em Americana, Campinas, Piracicaba, Lorena e São Paulo. No entanto, não foram encontradas informações específicas sobre programas de intercâmbio em aberto ou parcerias internacionais. Recomendo verificar o site oficial do UNISAL para obter informações atualizadas sobre intercâmbios.
+
+Fontes:
+
+Quero Bolsa - Campus UNISAL
+e-MEC - Detalhes dos Campus
+Pesquise voce no site do unisal para mim, e traga informações sobre programas de intercambio.
+
+O UNISAL oferece um Programa de Intercâmbio Internacional que visa proporcionar aos estudantes estrangeiros a oportunidade de vivenciar e se qualificar na realidade brasileira nos âmbitos social, político, cultural e educacional. A instituição possui parcerias com universidades como a Universidade Central do Chile (UCEN) para esses programas. Os estudantes podem participar de atividades acadêmicas nas unidades do UNISAL em Americana, Campinas e Lorena. As inscrições para o segundo semestre acadêmico de 2024 encerram-se em 10 de maio de 2024, enquanto para o intercâmbio com a UCEN Chile, as inscrições terminam em 10 de dezembro de 2024. Para mais detalhes, você pode consultar os seguintes links:
+
+UNISAL Internacionalização
+Intercâmbio com a UCEN Chile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OPENAI_API_KEY="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"
+tavily_api_key = "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"
+langchain_api_key = "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"
+groq_api_key = "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"
+
+# Database
+supabase_url = "https://moozgpvgtxctnncoflkr.supabase.co"
+supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vb3pncHZndHhjdG5uY29mbGtyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDcyODU4NSwiZXhwIjoyMDYwMzA0NTg1fQ.ktaBSwDsO1eATXRwH3ufcU5WXWIagDs4UPN6GGZV1Ys"
+database_url = "postgresql://postgres:12348910@db.moozgpvgtxctnncoflkr.supabase.co:5432/postgres"
+
+# LangSmith
+langsmith_api_key = "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"
+langchain_project = "portal-academico"
+
+# LLM Configuration
+llm_model = "gpt-4o"
+llm_temperature = 0.1
+llm_temperature_creative = 0.7
+
+# Cache Configuration
+cache_enabled = true
+cache_ttl = 3600
+cache_dir = "./cache"
+
+# Logging Configuration
+log_level = "INFO"
+tracing_enabled = true
+langsmith_project = "academic-agent"
+
+# Database Schema Cache
+schema_cache_ttl = 86400
+
+# Performance Settings
+timeout_seconds = 30
+max_retries = 3
+
+# RAG Configuration
+pdf_storage_dir = "./data/pdfs"
+embeddings_dir = "./data/embeddings"
+chunk_size = 1000
+chunk_overlap = 200
+rag_storage_type = "local"
+
+# Tavily Configuration
+tavily_max_results = 5
+tavily_search_depth = "basic"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Frameworks legais: 
+CARE AI Framework - Mão na roda para estruturar uma aplicação legal
+Empathy loop
+CRISP-DM (Pode ser interessante, dependendo do contexto e da abertura de aplicação que você deseja, principalmente para métricas e suporte ao acompanhamento profissional)
+Human-in-the-Loop Empathetic System (HITES)  - Se for fazer registro de histórico, sugiro dar uma olhada nesse também
+Big Five (OCEAN) - Se tiver o interesse em criar perfis afetivos para/do usuário
+ 
+Curto muito o OCEAN, acho que nesse contexto não entra muito, mas ele é bem versátil e simples 
+ 

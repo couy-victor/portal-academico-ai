@@ -300,3 +300,4 @@ SOFTWARE.
 
 **🎯 Academic Agent System - Transformando a educação através da Inteligência Artificial** 🚀
 
+Documentação criada em: 30/05/2024

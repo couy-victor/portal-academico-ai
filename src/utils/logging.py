@@ -100,3 +100,65 @@ def log_interaction(state: Dict[str, Any], run_id: Optional[str] = None) -> str:
         logger.info(f"🚫 LangSmith desabilitado: TRACING={TRACING_ENABLED}, client={langsmith_client is not None}")
     
     return run_id
+
+def log_error_to_langsmith(error_msg: str, context: Dict[str, Any] = None, run_id: Optional[str] = None):
+    """
+    Logs an error specifically to LangSmith with proper error handling.
+    
+    Args:
+        error_msg (str): The error message
+        context (Dict[str, Any]): Additional context
+        run_id (Optional[str]): Run ID to associate with
+    """
+    if not (TRACING_ENABLED and langsmith_client):
+        return
+        
+    if not run_id:
+        run_id = str(uuid.uuid4())
+        
+    try:
+        langsmith_client.create_run(
+            name="academic_agent_error",
+            run_type="tool",
+            project_name=LANGSMITH_PROJECT,
+            inputs=context or {},
+            outputs={"error": error_msg},
+            extra={
+                "metadata": {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "run_id": run_id,
+                    "level": "error"
+                }
+            },
+            tags=["academic-agent", "error"]
+        )
+    except Exception as e:
+        logger.error(f"Failed to log error to LangSmith: {str(e)}")
+
+def log_cache_hit(query: str, cache_key: str, run_id: Optional[str] = None):
+    """
+    Logs cache hits to LangSmith for performance monitoring.
+    """
+    if not (TRACING_ENABLED and langsmith_client):
+        return
+        
+    if not run_id:
+        run_id = str(uuid.uuid4())
+        
+    try:
+        langsmith_client.create_run(
+            name="cache_hit",
+            run_type="retriever",
+            project_name=LANGSMITH_PROJECT,
+            inputs={"query": query, "cache_key": cache_key},
+            outputs={"status": "hit"},
+            extra={
+                "metadata": {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "cache_performance": True
+                }
+            },
+            tags=["academic-agent", "cache", "performance"]
+        )
+    except Exception as e:
+        logger.error(f"Failed to log cache hit to LangSmith: {str(e)}")
