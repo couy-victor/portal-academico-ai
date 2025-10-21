@@ -6,9 +6,11 @@ import json
 import time
 import hashlib
 from typing import Any, Dict, Optional
-from diskcache import Cache
 
 from src.config.settings import CACHE_ENABLED, CACHE_DIR, CACHE_TTL
+from src.utils.logging import logger
+
+from diskcache import Cache
 
 # Initialize cache
 cache = Cache(CACHE_DIR)

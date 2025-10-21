@@ -1,0 +1,65 @@
+
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Cronograma de Estudos</title>
+                            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                            <script type="text/javascript">
+                                google.charts.load('current', {'packages':['timeline']});
+                                google.charts.setOnLoadCallback(drawChart);
+
+                                function drawChart() {
+                                    var container = document.getElementById('timeline');
+                                    var chart = new google.visualization.Timeline(container);
+                                    var dataTable = new google.visualization.DataTable();
+
+                                    dataTable.addColumn({ type: 'string', id: 'Task' });
+                                    dataTable.addColumn({ type: 'date', id: 'Start' });
+                                    dataTable.addColumn({ type: 'date', id: 'End' });
+
+                                    var rows = [];
+
+                                    
+                                        var year = parseInt("2025");
+                                        var month = parseInt("5") - 1; // JS months are 0-based
+                                        var day = parseInt("25");
+
+                                        var start_date = new Date(year, month, day);
+                                        var end_date = new Date(year, month, day);
+                                        end_date.setDate(end_date.getDate() + 1);
+
+                                        rows.push(["Simulado e Revisão Final", start_date, end_date]);
+                                    {% endfor %}
+
+                                    dataTable.addRows(rows);
+
+                                    var options = {
+                                        timeline: { colorByRowLabel: true },
+                                        backgroundColor: '#f9f9f9',
+                                        alternatingRowStyle: true,
+                                        height: 600
+                                    };
+
+                                    chart.draw(dataTable, options);
+                                }
+                            </script>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; }
+                                h1 { color: #435334; text-align: center; }
+                                #timeline { width: 100%; height: 600px; }
+                                .container { max-width: 1200px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                                .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <h1>Cronograma de Estudos</h1>
+                                <div id="timeline"></div>
+                                <div class="footer">
+                                    Gerado pelo Assistente Acadêmico - UNISAL<br>
+                                    21/05/2025 15:13:39
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                        

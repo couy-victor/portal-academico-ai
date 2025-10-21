@@ -61,17 +61,17 @@ def create_academic_graph() -> Callable:
     academic_graph.add_node("logger", logger_agent)
 
     # Define routing function
-    def route_from_cache(state: AcademicAgentState) -> str:
+    def route_from_cache(state: AcademicAgentState) -> Dict[str, Any]:
         """Routes based on cache hit."""
         if state.get("from_cache", False):
             logger.info("Cache hit, skipping to response generator")
-            return "response_generator"
-        return "main_router"  # Vai para o roteador principal em vez do intent_router
+            return {"next": "response_generator"}
+        return {"next": "main_router"}  # Vai para o roteador principal em vez do intent_router
 
     # Define conditional edges for main router
     academic_graph.add_conditional_edges(
         "main_router",
-        main_router_agent,  # Esta função retorna uma lista de nós para onde ir
+        lambda state: main_router_agent(state)["next"],  # Extrair a chave "next" do dicionário retornado
         {
             "emotional_support": "emotional_support",
             "tutor": "tutor",
@@ -83,7 +83,16 @@ def create_academic_graph() -> Callable:
     # Connect the nodes - simplified version
     academic_graph.add_edge(START, "user_context_node")
     academic_graph.add_edge("user_context_node", "cache_check")
-    academic_graph.add_edge("cache_check", route_from_cache)  # Usa a função de roteamento
+
+    # Adicionar roteamento condicional a partir do cache_check
+    academic_graph.add_conditional_edges(
+        "cache_check",
+        lambda state: route_from_cache(state)["next"],  # Extrair a chave "next" do dicionário retornado
+        {
+            "response_generator": "response_generator",
+            "main_router": "main_router"
+        }
+    )
 
     # Fluxo para o agente acadêmico
     academic_graph.add_edge("intent_router", "tavily_search")

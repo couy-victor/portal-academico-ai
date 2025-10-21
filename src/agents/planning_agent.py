@@ -1,6 +1,33 @@
 """
-Academic Planning Agent for the Academic Agent system.
-Responsible for helping students plan their studies, set goals, and manage their time.
+Agente de Planejamento Acadêmico para o sistema Academic Agent.
+Responsável por ajudar estudantes a planejar seus estudos, definir metas e gerenciar seu tempo.
+
+Este agente implementa diferentes métodos de estudo baseados em evidências científicas:
+
+1. Método Pomodoro:
+   - Divide o tempo de estudo em blocos focados (geralmente 25 minutos)
+   - Intercala com pausas curtas (5 minutos) e pausas longas (15-30 minutos)
+   - Ajuda a manter o foco e evitar a fadiga mental
+
+2. Active Recall (Recuperação Ativa):
+   - Baseado em testar ativamente o conhecimento em vez de apenas revisar
+   - Utiliza flashcards, quizzes e auto-questionamento
+   - Comprovadamente mais eficaz para retenção de longo prazo
+
+3. Time Blocking (Blocos de Tempo):
+   - Aloca blocos específicos de tempo para diferentes tarefas/disciplinas
+   - Prioriza conteúdos mais difíceis nos horários de pico cognitivo
+   - Melhora a gestão do tempo e reduz a procrastinação
+
+O agente analisa a consulta do usuário, identifica o objetivo de planejamento e recomenda
+um plano estruturado utilizando o método mais adequado, com tarefas específicas,
+recursos recomendados e dicas de implementação.
+
+Recursos adicionais implementados:
+- Exportação para PDF: Possibilidade de exportar o plano de estudos em formato PDF
+- Integração com Calendário: Criação de arquivos .ics para importação em calendários
+- Visualização de Timeline: Representação visual do cronograma de estudos
+- Gamificação: Elementos de gamificação para aumentar a motivação
 """
 import json
 from typing import Dict, Any, List
@@ -15,13 +42,17 @@ from src.utils.logging import logger
 
 def planning_goal_analyzer(state: AcademicAgentState) -> AcademicAgentState:
     """
-    Analyzes the planning goal from the user's query.
+    Analisa o objetivo de planejamento a partir da consulta do usuário.
+
+    Esta função identifica o objetivo principal, o período de tempo relevante,
+    restrições mencionadas e preferências de método de estudo (Pomodoro,
+    Active Recall ou Time Blocking).
 
     Args:
-        state (AcademicAgentState): Current state
+        state (AcademicAgentState): Estado atual
 
     Returns:
-        AcademicAgentState: Updated state with planning goal information
+        AcademicAgentState: Estado atualizado com informações do objetivo de planejamento
     """
     # Skip if we already have an error or coming from cache
     if state.get("error") or state.get("from_cache", False):
@@ -38,6 +69,11 @@ def planning_goal_analyzer(state: AcademicAgentState) -> AcademicAgentState:
     1. O objetivo principal de planejamento (ex: preparação para prova, organização de estudos, etc.)
     2. O período de tempo relevante (curto prazo: dias, médio prazo: semanas, longo prazo: meses)
     3. Quaisquer restrições ou desafios mencionados pelo estudante
+    4. Preferência por método de estudo, se mencionado:
+       - "pomodoro": Técnica de blocos de tempo focado com pausas
+       - "active_recall": Método de recuperação ativa/teste de conhecimento
+       - "time_blocking": Organização em blocos de tempo por disciplina/tarefa
+       - "não_especificado": Se nenhum método for mencionado explicitamente
 
     Formato da resposta:
     ```json
@@ -45,6 +81,7 @@ def planning_goal_analyzer(state: AcademicAgentState) -> AcademicAgentState:
         "planning_goal": "objetivo_identificado",
         "planning_timeframe": "curto/médio/longo",
         "planning_constraints": "restrições_ou_desafios",
+        "study_method": "pomodoro/active_recall/time_blocking/não_especificado",
         "reasoning": "seu_raciocínio_para_esta_análise"
     }
     ```
@@ -101,11 +138,45 @@ def planning_goal_analyzer(state: AcademicAgentState) -> AcademicAgentState:
         state["planning_goal"] = result["planning_goal"]
         state["planning_timeframe"] = result["planning_timeframe"]
 
+        # Armazenar o método de estudo preferido
+        study_method = result.get("study_method", "não_especificado")
+        state["study_method"] = study_method
+
+        # Configurações padrão para cada método de estudo
+        if study_method == "pomodoro":
+            state["focus_time"] = 25  # minutos
+            state["break_time"] = 5   # minutos
+            state["long_break"] = 15  # minutos
+        elif study_method == "active_recall":
+            state["review_frequency"] = "diária"
+            state["quiz_type"] = "flashcards e auto-questionamento"
+        elif study_method == "time_blocking":
+            state["min_block"] = 30   # minutos
+            state["priority_time"] = "manhã"  # período de maior produtividade
+
         # Store additional information in metadata
         if "metadata" not in state:
             state["metadata"] = {}
         state["metadata"]["planning_constraints"] = result.get("planning_constraints", "")
         state["metadata"]["planning_reasoning"] = result.get("reasoning", "")
+        state["metadata"]["study_method_details"] = {
+            "method": study_method,
+            "config": {
+                "pomodoro": {
+                    "focus_time": state.get("focus_time", 25),
+                    "break_time": state.get("break_time", 5),
+                    "long_break": state.get("long_break", 15)
+                },
+                "active_recall": {
+                    "review_frequency": state.get("review_frequency", "diária"),
+                    "quiz_type": state.get("quiz_type", "flashcards e auto-questionamento")
+                },
+                "time_blocking": {
+                    "min_block": state.get("min_block", 30),
+                    "priority_time": state.get("priority_time", "manhã")
+                }
+            }
+        }
 
         # Log success
         logger.info(f"Analyzed planning goal: {state['planning_goal']}, timeframe: {state['planning_timeframe']}")
@@ -122,13 +193,17 @@ def planning_goal_analyzer(state: AcademicAgentState) -> AcademicAgentState:
 
 def task_generator(state: AcademicAgentState) -> AcademicAgentState:
     """
-    Generates tasks for the planning goal.
+    Gera tarefas específicas para o objetivo de planejamento.
+
+    Esta função cria um plano de estudo detalhado com tarefas específicas
+    baseadas no método de estudo selecionado (Pomodoro, Active Recall ou
+    Time Blocking), considerando o objetivo, período de tempo e restrições.
 
     Args:
-        state (AcademicAgentState): Current state
+        state (AcademicAgentState): Estado atual
 
     Returns:
-        AcademicAgentState: Updated state with planning tasks
+        AcademicAgentState: Estado atualizado com tarefas de planejamento
     """
     # Skip if we already have an error or coming from cache
     if state.get("error") or state.get("from_cache", False):
@@ -144,12 +219,15 @@ def task_generator(state: AcademicAgentState) -> AcademicAgentState:
     # Create prompt for task generation
     prompt = ChatPromptTemplate.from_template("""
     Você é um especialista em planejamento acadêmico, capaz de criar planos de estudo
-    eficazes e personalizados.
+    eficazes e personalizados utilizando o método {study_method}.
 
     Objetivo de planejamento: {planning_goal}
     Período de tempo: {planning_timeframe}
     Restrições/Desafios: {planning_constraints}
     Data atual: {current_date}
+    Método de estudo: {study_method}
+
+    {method_details}
 
     Crie um plano de estudo detalhado com tarefas específicas que:
     1. Sejam alinhadas ao objetivo identificado
@@ -157,13 +235,15 @@ def task_generator(state: AcademicAgentState) -> AcademicAgentState:
     3. Considerem as restrições mencionadas
     4. Incluam datas/prazos específicos
     5. Sejam específicas, mensuráveis e alcançáveis
+    6. Sigam as diretrizes do método de estudo selecionado
 
     Para cada tarefa, forneça:
     1. Um título descritivo
-    2. Uma descrição detalhada
+    2. Uma descrição detalhada que incorpore o método de estudo
     3. Uma data/prazo sugerido
     4. Uma estimativa de duração
     5. Prioridade (alta, média, baixa)
+    6. Dicas específicas para aplicar o método de estudo nesta tarefa
 
     Formato da resposta:
     ```json
@@ -174,7 +254,8 @@ def task_generator(state: AcademicAgentState) -> AcademicAgentState:
                 "description": "descrição_detalhada",
                 "deadline": "data_sugerida",
                 "duration": "estimativa_de_duração",
-                "priority": "alta/média/baixa"
+                "priority": "alta/média/baixa",
+                "method_tip": "dica_específica_para_o_método"
             },
             ...
         ]
@@ -186,12 +267,64 @@ def task_generator(state: AcademicAgentState) -> AcademicAgentState:
     llm = ChatOpenAI(model=LLM_MODEL, temperature=LLM_TEMPERATURE_CREATIVE)
 
     try:
+        # Preparar detalhes específicos do método de estudo
+        study_method = state.get("study_method", "não_especificado")
+        method_details = ""
+
+        if study_method == "pomodoro":
+            focus_time = state.get("focus_time", 25)
+            break_time = state.get("break_time", 5)
+            long_break = state.get("long_break", 15)
+            method_details = f"""
+            Detalhes do método Pomodoro:
+            - Sessões de foco: {focus_time} minutos
+            - Pausas curtas: {break_time} minutos
+            - Pausas longas (a cada 4 sessões): {long_break} minutos
+            - Organize as tarefas em blocos Pomodoro
+            - Priorize tarefas que exigem mais concentração para as primeiras sessões
+            - Inclua pausas estratégicas entre as sessões
+            """
+        elif study_method == "active_recall":
+            review_frequency = state.get("review_frequency", "diária")
+            quiz_type = state.get("quiz_type", "flashcards e auto-questionamento")
+            method_details = f"""
+            Detalhes do método Active Recall:
+            - Frequência de revisão: {review_frequency}
+            - Tipos de teste: {quiz_type}
+            - Estruture o estudo em forma de perguntas e respostas
+            - Inclua momentos para testar ativamente o conhecimento
+            - Priorize a recuperação da informação sem consulta prévia
+            - Organize revisões espaçadas para reforçar o aprendizado
+            """
+        elif study_method == "time_blocking":
+            min_block = state.get("min_block", 30)
+            priority_time = state.get("priority_time", "manhã")
+            method_details = f"""
+            Detalhes do método Time Blocking:
+            - Duração mínima dos blocos: {min_block} minutos
+            - Período de prioridade: {priority_time}
+            - Aloque blocos específicos para cada disciplina/tarefa
+            - Priorize conteúdos mais difíceis no período de {priority_time}
+            - Mantenha blocos de tempo contínuos para tarefas similares
+            - Inclua pequenos intervalos entre os blocos
+            """
+        else:
+            method_details = """
+            Método de estudo não especificado. Crie um plano equilibrado que:
+            - Alterne entre diferentes tipos de atividades
+            - Inclua pausas regulares
+            - Priorize conteúdos mais importantes
+            - Distribua o estudo ao longo do período disponível
+            """
+
         # Prepare inputs
         inputs = {
             "planning_goal": state["planning_goal"],
             "planning_timeframe": state["planning_timeframe"],
             "planning_constraints": state["metadata"].get("planning_constraints", "Nenhuma restrição específica mencionada."),
-            "current_date": current_date.strftime("%d/%m/%Y")
+            "current_date": current_date.strftime("%d/%m/%Y"),
+            "study_method": study_method,
+            "method_details": method_details
         }
 
         # Execute the generation
@@ -262,13 +395,17 @@ def task_generator(state: AcademicAgentState) -> AcademicAgentState:
 
 def resource_recommender(state: AcademicAgentState) -> AcademicAgentState:
     """
-    Recommends resources for the planning goal.
+    Recomenda recursos específicos para o objetivo de planejamento.
+
+    Esta função sugere ferramentas, aplicativos, técnicas e materiais
+    de referência que complementam o método de estudo escolhido e
+    ajudam o estudante a alcançar seu objetivo de planejamento.
 
     Args:
-        state (AcademicAgentState): Current state
+        state (AcademicAgentState): Estado atual
 
     Returns:
-        AcademicAgentState: Updated state with planning resources
+        AcademicAgentState: Estado atualizado com recursos de planejamento
     """
     # Skip if we already have an error or coming from cache
     if state.get("error") or state.get("from_cache", False):
@@ -285,19 +422,24 @@ def resource_recommender(state: AcademicAgentState) -> AcademicAgentState:
 
     Objetivo de planejamento: {planning_goal}
     Período de tempo: {planning_timeframe}
+    Método de estudo: {study_method}
 
-    Recomende 3-5 recursos que possam ajudar o estudante a alcançar seu objetivo.
-    Os recursos podem incluir:
-    - Ferramentas de gestão de tempo (apps, técnicas)
-    - Métodos de estudo
-    - Materiais de referência
-    - Técnicas de produtividade
-    - Estratégias de organização
+    {method_resources}
+
+    Recomende 4-6 recursos que possam ajudar o estudante a alcançar seu objetivo,
+    priorizando aqueles que complementam o método de estudo escolhido.
+
+    Os recursos devem incluir:
+    - Pelo menos 1 aplicativo ou ferramenta digital
+    - Pelo menos 1 técnica específica para o método de estudo
+    - Pelo menos 1 recurso para exportação/visualização do plano (PDF, calendário, timeline)
+    - Outros recursos relevantes para o objetivo específico
 
     Para cada recurso, forneça:
     1. Um título
-    2. Uma descrição breve
-    3. Como este recurso pode ajudar especificamente com o objetivo do estudante
+    2. Uma descrição detalhada
+    3. Como este recurso complementa o método de estudo escolhido
+    4. Link ou informação de instalação (quando aplicável)
 
     Formato da resposta:
     ```json
@@ -305,8 +447,9 @@ def resource_recommender(state: AcademicAgentState) -> AcademicAgentState:
         "resources": [
             {
                 "title": "título_do_recurso",
-                "description": "descrição_breve",
-                "relevance": "como_ajuda_com_o_objetivo"
+                "description": "descrição_detalhada",
+                "relevance": "como_complementa_o_método",
+                "installation": "pip install package-name (se aplicável)"
             },
             ...
         ]
@@ -318,10 +461,61 @@ def resource_recommender(state: AcademicAgentState) -> AcademicAgentState:
     llm = ChatOpenAI(model=LLM_MODEL, temperature=LLM_TEMPERATURE_CREATIVE)
 
     try:
+        # Preparar recursos específicos para o método de estudo
+        study_method = state.get("study_method", "não_especificado")
+        method_resources = ""
+
+        if study_method == "pomodoro":
+            method_resources = """
+            Recursos específicos para o método Pomodoro:
+            - Aplicativos de temporizador Pomodoro (como Pomodoro Timer, Forest, Focus To-Do)
+            - Biblioteca Python: pomodoro-timer (pip install pomodoro-timer)
+            - Técnicas de transição entre tarefas durante as pausas
+            - Métodos para maximizar a produtividade durante os blocos de foco
+            - Ferramentas para exportação do plano para PDF: fpdf2 (pip install fpdf2)
+            - Integração com calendário: ics (pip install ics)
+            - Visualização de timeline: streamlit-timeline (pip install streamlit-timeline)
+            """
+        elif study_method == "active_recall":
+            method_resources = """
+            Recursos específicos para o método Active Recall:
+            - Aplicativos de flashcards (como Anki, Quizlet, RemNote)
+            - Técnicas de elaboração de perguntas eficazes
+            - Métodos de revisão espaçada
+            - Ferramentas para criação de mapas mentais
+            - Ferramentas para exportação do plano para PDF: fpdf2 (pip install fpdf2)
+            - Integração com calendário: ics (pip install ics)
+            - Visualização de timeline: streamlit-timeline (pip install streamlit-timeline)
+            """
+        elif study_method == "time_blocking":
+            method_resources = """
+            Recursos específicos para o método Time Blocking:
+            - Aplicativos de calendário com blocos de tempo (como Google Calendar, Notion, TickTick)
+            - Técnicas para identificar horários de pico de produtividade
+            - Métodos para estimar corretamente a duração das tarefas
+            - Estratégias para lidar com interrupções durante os blocos
+            - Ferramentas para exportação do plano para PDF: fpdf2 (pip install fpdf2)
+            - Integração com calendário: ics (pip install ics)
+            - Visualização de timeline: streamlit-timeline (pip install streamlit-timeline)
+            """
+        else:
+            method_resources = """
+            Recursos gerais para planejamento de estudos:
+            - Aplicativos de gestão de tarefas (como Todoist, Trello, Notion)
+            - Técnicas de priorização (como matriz de Eisenhower)
+            - Métodos para manter a motivação e foco
+            - Estratégias para lidar com procrastinação
+            - Ferramentas para exportação do plano para PDF: fpdf2 (pip install fpdf2)
+            - Integração com calendário: ics (pip install ics)
+            - Visualização de timeline: streamlit-timeline (pip install streamlit-timeline)
+            """
+
         # Prepare inputs
         inputs = {
             "planning_goal": state["planning_goal"],
-            "planning_timeframe": state["planning_timeframe"]
+            "planning_timeframe": state["planning_timeframe"],
+            "study_method": study_method,
+            "method_resources": method_resources
         }
 
         # Execute the recommendation
@@ -388,13 +582,18 @@ def resource_recommender(state: AcademicAgentState) -> AcademicAgentState:
 
 def planning_response_generator(state: AcademicAgentState) -> AcademicAgentState:
     """
-    Generates a response with the planning information.
+    Gera uma resposta em linguagem natural para o objetivo de planejamento.
+
+    Esta função cria uma resposta estruturada e formatada em markdown que
+    apresenta o plano de estudo completo, incluindo tarefas, recursos e
+    dicas específicas para o método de estudo escolhido. A resposta é
+    otimizada para visualização no Streamlit.
 
     Args:
-        state (AcademicAgentState): Current state
+        state (AcademicAgentState): Estado atual
 
     Returns:
-        AcademicAgentState: Updated state with natural language response
+        AcademicAgentState: Estado atualizado com resposta em linguagem natural
     """
     # If we already have a natural response, return
     if state.get("natural_response"):
@@ -407,24 +606,33 @@ def planning_response_generator(state: AcademicAgentState) -> AcademicAgentState
     # Create prompt for planning response
     prompt = ChatPromptTemplate.from_template("""
     Você é um assistente de planejamento acadêmico organizado e motivador, especializado em ajudar
-    estudantes a planejar seus estudos e alcançar seus objetivos acadêmicos.
+    estudantes a planejar seus estudos e alcançar seus objetivos acadêmicos utilizando o método {study_method}.
 
     Pergunta original do estudante: {query}
 
     Objetivo de planejamento identificado: {planning_goal}
     Período de tempo: {planning_timeframe}
+    Método de estudo: {study_method}
+
+    {method_details}
 
     {tasks_section}
 
     {resources_section}
 
-    Gere uma resposta detalhada que:
-    1. Reconheça o objetivo do estudante
-    2. Apresente um plano de estudo estruturado com tarefas específicas
-    3. Inclua datas/prazos sugeridos
-    4. Recomende recursos úteis
-    5. Ofereça dicas de implementação do plano
-    6. Use um tom organizado, motivador e encorajador
+    Gere uma resposta detalhada em formato markdown que:
+    1. Tenha um título atraente relacionado ao método de estudo e objetivo
+    2. Comece com uma breve introdução motivadora sobre o método escolhido
+    3. Apresente o plano de estudo estruturado com tarefas específicas
+    4. Inclua datas/prazos sugeridos em formato de cronograma
+    5. Recomende recursos úteis com links quando disponíveis
+    6. Ofereça dicas de implementação específicas para o método escolhido
+    7. Mencione as possibilidades de exportação (PDF, calendário, timeline)
+    8. Use formatação markdown para melhorar a visualização (títulos, listas, negrito, etc.)
+    9. Inclua uma seção de "Como medir seu progresso" com métricas específicas
+    10. Termine com uma mensagem motivadora
+
+    Formate sua resposta com um título atraente, introdução motivadora, e seções bem definidas usando markdown para uma melhor visualização no Streamlit.
 
     Resposta:
     """)
@@ -449,11 +657,63 @@ def planning_response_generator(state: AcademicAgentState) -> AcademicAgentState
                 resources_section += f"{i+1}. {resource['title']}: {resource['description']}\n"
                 resources_section += f"   Relevância: {resource['relevance']}\n\n"
 
+        # Preparar detalhes específicos do método de estudo
+        study_method = state.get("study_method", "não_especificado")
+        method_details = ""
+
+        if study_method == "pomodoro":
+            focus_time = state.get("focus_time", 25)
+            break_time = state.get("break_time", 5)
+            long_break = state.get("long_break", 15)
+            method_details = f"""
+            Detalhes do método Pomodoro:
+            - Sessões de foco: {focus_time} minutos
+            - Pausas curtas: {break_time} minutos
+            - Pausas longas (a cada 4 sessões): {long_break} minutos
+            - Organize as tarefas em blocos Pomodoro
+            - Priorize tarefas que exigem mais concentração para as primeiras sessões
+            - Inclua pausas estratégicas entre as sessões
+            """
+        elif study_method == "active_recall":
+            review_frequency = state.get("review_frequency", "diária")
+            quiz_type = state.get("quiz_type", "flashcards e auto-questionamento")
+            method_details = f"""
+            Detalhes do método Active Recall:
+            - Frequência de revisão: {review_frequency}
+            - Tipos de teste: {quiz_type}
+            - Estruture o estudo em forma de perguntas e respostas
+            - Inclua momentos para testar ativamente o conhecimento
+            - Priorize a recuperação da informação sem consulta prévia
+            - Organize revisões espaçadas para reforçar o aprendizado
+            """
+        elif study_method == "time_blocking":
+            min_block = state.get("min_block", 30)
+            priority_time = state.get("priority_time", "manhã")
+            method_details = f"""
+            Detalhes do método Time Blocking:
+            - Duração mínima dos blocos: {min_block} minutos
+            - Período de prioridade: {priority_time}
+            - Aloque blocos específicos para cada disciplina/tarefa
+            - Priorize conteúdos mais difíceis no período de {priority_time}
+            - Mantenha blocos de tempo contínuos para tarefas similares
+            - Inclua pequenos intervalos entre os blocos
+            """
+        else:
+            method_details = """
+            Método de estudo não especificado. Crie um plano equilibrado que:
+            - Alterne entre diferentes tipos de atividades
+            - Inclua pausas regulares
+            - Priorize conteúdos mais importantes
+            - Distribua o estudo ao longo do período disponível
+            """
+
         # Prepare inputs
         inputs = {
             "query": state["user_query"],
             "planning_goal": state.get("planning_goal", "organização de estudos"),
             "planning_timeframe": state.get("planning_timeframe", "médio prazo"),
+            "study_method": study_method,
+            "method_details": method_details,
             "tasks_section": tasks_section,
             "resources_section": resources_section
         }
@@ -477,13 +737,17 @@ def planning_response_generator(state: AcademicAgentState) -> AcademicAgentState
 
 def generate_error_response(state: AcademicAgentState) -> AcademicAgentState:
     """
-    Generates an error response.
+    Gera uma resposta de erro amigável.
+
+    Esta função cria uma resposta de erro que não expõe detalhes técnicos
+    ao usuário, mas oferece dicas úteis e alternativas para o planejamento
+    de estudos, mantendo uma experiência positiva mesmo quando ocorrem erros.
 
     Args:
-        state (AcademicAgentState): Current state
+        state (AcademicAgentState): Estado atual
 
     Returns:
-        AcademicAgentState: Updated state with error response
+        AcademicAgentState: Estado atualizado com resposta de erro
     """
     # Extract error message
     error_message = state.get("error", "Erro desconhecido")
@@ -533,13 +797,23 @@ def generate_error_response(state: AcademicAgentState) -> AcademicAgentState:
 
 def planning_agent(state: AcademicAgentState) -> AcademicAgentState:
     """
-    Main entry point for the planning agent.
+    Ponto de entrada principal para o agente de planejamento acadêmico.
+
+    Esta função coordena o fluxo completo do agente de planejamento:
+    1. Análise do objetivo de planejamento e método de estudo
+    2. Geração de tarefas específicas baseadas no método escolhido
+    3. Recomendação de recursos complementares
+    4. Geração de resposta formatada em markdown
+
+    O agente suporta diferentes métodos de estudo (Pomodoro, Active Recall,
+    Time Blocking) e inclui recursos para exportação (PDF, calendário) e
+    visualização (timeline) do plano de estudos.
 
     Args:
-        state (AcademicAgentState): Current state
+        state (AcademicAgentState): Estado atual
 
     Returns:
-        AcademicAgentState: Updated state with planning response
+        AcademicAgentState: Estado atualizado com resposta de planejamento
     """
     # Skip if we already have an error or coming from cache
     if state.get("error") or state.get("from_cache", False):

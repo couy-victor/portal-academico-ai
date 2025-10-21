@@ -3,14 +3,19 @@ Supabase client for the Academic Agent system.
 """
 import json
 import re
-from supabase import create_client
 from typing import Dict, List, Any, Optional, Tuple
 
 from src.config.settings import SUPABASE_URL, SUPABASE_KEY, SCHEMA_CACHE_TTL
 from src.utils.cache import get_cache, set_cache
+from src.utils.logging import logger
+
+from supabase import create_client
 
 # Initialize Supabase client
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+
 
 def get_schema_info() -> Dict[str, Any]:
     """
@@ -359,7 +364,7 @@ def sanitize_and_parameterize_sql(sql: str, user_context: Dict[str, Any]) -> Tup
         else:
             # Valor padrão para testes
             sql = sql.replace("{RA}", ":ra")
-            params["ra"] = user_id if 'user_id' in locals() else "201268"
+            params["ra"] = "201268"
 
     # Verificar se o SQL contém :RA diretamente (sem chaves)
     if ":RA" in sql:
@@ -371,7 +376,7 @@ def sanitize_and_parameterize_sql(sql: str, user_context: Dict[str, Any]) -> Tup
             params["RA"] = user_context["ra"]
         else:
             # Valor padrão para testes
-            params["RA"] = user_id if 'user_id' in locals() else "201268"
+            params["RA"] = "201268"
 
     # Verificar se o SQL contém um placeholder para o RA (m.ra = ?)
     if "m.ra = ?" in sql or "ra = ?" in sql:
@@ -383,7 +388,7 @@ def sanitize_and_parameterize_sql(sql: str, user_context: Dict[str, Any]) -> Tup
             params["ra"] = user_context["RA"]
         # Se não tiver nenhum desses, use o valor hardcoded para testes
         else:
-            params["ra"] = user_id if 'user_id' in locals() else "201268"  # Valor padrão para testes
+            params["ra"] = "201268"  # Valor padrão para testes
 
     # Replace {{user_id}} with :user_id parameter
     if "{{user_id}}" in sql:
